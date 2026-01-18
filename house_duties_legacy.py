@@ -45,7 +45,7 @@ except ImportError:
     validate_brothers = None
     ValidationError = ValueError
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 # =========================
 # CONFIG — EDIT THIS PART

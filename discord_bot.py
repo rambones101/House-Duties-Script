@@ -15,12 +15,29 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ===== CONFIGURATION =====
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")  # Replace with your bot token
-CHANNEL_ID = int(os.getenv("CHANNEL_ID"))  # Replace with your channel ID
-RUN_TIME_HOUR = 8  # 8 AM on Sundays
-RUN_TIME_MINUTE = 0
-SCRIPT_PATH = "house_duties.py"  # Path to the scheduler script
-PYTHON_CMD = "python"  # or "python3" or full path like "C:/Python312/python.exe"
+# Load from environment variables with defaults
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+CHANNEL_ID = os.getenv("CHANNEL_ID")
+RUN_TIME_HOUR = int(os.getenv("RUN_TIME_HOUR", "8"))
+RUN_TIME_MINUTE = int(os.getenv("RUN_TIME_MINUTE", "0"))
+SCRIPT_PATH = os.getenv("SCRIPT_PATH", "house_duties.py")
+PYTHON_CMD = os.getenv("PYTHON_CMD", "python")
+
+# Validation
+if not DISCORD_TOKEN:
+    raise ValueError("DISCORD_TOKEN environment variable is required. See .env.example")
+if not CHANNEL_ID:
+    raise ValueError("CHANNEL_ID environment variable is required. See .env.example")
+
+try:
+    CHANNEL_ID = int(CHANNEL_ID)
+except ValueError:
+    raise ValueError(f"CHANNEL_ID must be a valid integer, got: {CHANNEL_ID}")
+
+if not (0 <= RUN_TIME_HOUR <= 23):
+    raise ValueError(f"RUN_TIME_HOUR must be 0-23, got: {RUN_TIME_HOUR}")
+if not (0 <= RUN_TIME_MINUTE <= 59):
+    raise ValueError(f"RUN_TIME_MINUTE must be 0-59, got: {RUN_TIME_MINUTE}")
 # ========================
 
 # Bot setup with minimal intents
@@ -168,9 +185,10 @@ async def ping(ctx):
 
 # Run the bot
 if __name__ == "__main__":
-    if DISCORD_TOKEN == "YOUR_BOT_TOKEN_HERE":
-        print("❌ ERROR: Please set your Discord bot token in DISCORD_TOKEN")
-        print("📖 See setup instructions in DISCORD_BOT_SETUP.md")
-    else:
-        print("🚀 Starting Discord bot...")
-        bot.run(DISCORD_TOKEN)
+    print("🚀 Starting Discord bot...")
+    print(f"📋 Configuration:")
+    print(f"   Channel ID: {CHANNEL_ID}")
+    print(f"   Run Time: {RUN_TIME_HOUR:02d}:{RUN_TIME_MINUTE:02d}")
+    print(f"   Script: {SCRIPT_PATH}")
+    print(f"   Python: {PYTHON_CMD}")
+    bot.run(DISCORD_TOKEN)

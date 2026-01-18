@@ -11,6 +11,7 @@ A fraternity house chore scheduling system with persistent state tracking, fairn
 - **Bonus Task Selection**: Dynamically assigns 2-3 cleanings/week based on roster size
 - **Constraint Support**: Handles opt-outs, category bans, and task-specific restrictions
 - **Data Validation**: Comprehensive input validation for brothers, tasks, and constraints
+- **Environment Variable Configuration**: Secure configuration via .env files for Discord bot
 - **Discord Bot Integration**: Optional bot for posting schedules and sending reminders
 
 ## Quick Start
@@ -190,13 +191,32 @@ Edit constants at the top of [house_duties.py](house_duties.py):
 
 ## Discord Bot (Optional)
 
-Post schedules automatically to Discord with reminders.
+Post schedules automatically to Discord with reminders. Configuration is managed through environment variables for security.
 
-### Setup
+### Quick Setup
 
-1. Follow [DISCORD_BOT_SETUP.md](DISCORD_BOT_SETUP.md) for bot creation
-2. Copy `.env.example` to `.env` and add your bot token
-3. Run: `python discord_bot.py`
+1. **Create bot**: Follow [DISCORD_BOT_SETUP.md](DISCORD_BOT_SETUP.md) for Discord bot creation
+2. **Configure**: Copy `.env.example` to `.env` and fill in your values:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your Discord token and channel ID
+   ```
+3. **Run**: `python discord_bot.py`
+
+### Environment Variables
+
+The bot uses these environment variables from `.env`:
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `DISCORD_TOKEN` | ✅ Yes | - | Your Discord bot token |
+| `CHANNEL_ID` | ✅ Yes | - | Discord channel ID for posting |
+| `RUN_TIME_HOUR` | No | 8 | Hour to run (0-23, 24-hour format) |
+| `RUN_TIME_MINUTE` | No | 0 | Minute to run (0-59) |
+| `SCRIPT_PATH` | No | house_duties.py | Path to scheduler script |
+| `PYTHON_CMD` | No | python | Python command to execute |
+
+**Security Note:** `.env` is in `.gitignore` and never committed to version control.
 
 See [DISCORD_BOT_SETUP.md](DISCORD_BOT_SETUP.md) for detailed configuration.
 
@@ -245,7 +265,7 @@ python house_duties.py --ignore-validation-errors
 
 ### Running Tests
 
-The project includes a comprehensive test suite with 96 tests covering core functionality:
+The project includes a comprehensive test suite with 108 tests covering core functionality:
 
 ```powershell
 # Install test dependencies
@@ -277,6 +297,7 @@ pytest --cov=house_duties --cov-report=html
 - Bonus task selection algorithm (10 tests)
 - CLI argument parsing (7 tests)
 - Data validation (42 tests)
+- Discord bot configuration (12 tests)
 
 ### Adding New Tasks
 

@@ -37,39 +37,43 @@ pip install discord.py
 
 ## Step 5: Configure the Bot
 
-Open `discord_bot.py` and edit:
+### Create Environment Configuration
 
-```python
-DISCORD_TOKEN = "YOUR_BOT_TOKEN_HERE"  # Paste your bot token from Step 1
-CHANNEL_ID = 123456789012345678  # Paste your channel ID from Step 3
-RUN_TIME_HOUR = 8  # Hour to run (24-hour format, e.g., 8 = 8 AM, 20 = 8 PM)
-RUN_TIME_MINUTE = 0  # Minute to run
-```
+1. Copy the example environment file:
+   ```powershell
+   Copy-Item .env.example .env
+   ```
 
-**⚠️ IMPORTANT**: Keep your token secret! Don't commit it to git.
+2. Edit `.env` and fill in your values:
+   ```env
+   # Required
+   DISCORD_TOKEN=your_bot_token_from_step_1
+   CHANNEL_ID=your_channel_id_from_step_3
+   
+   # Optional (defaults shown)
+   RUN_TIME_HOUR=8
+   RUN_TIME_MINUTE=0
+   SCRIPT_PATH=house_duties.py
+   PYTHON_CMD=python
+   ```
 
-### Better: Use Environment Variables
+3. **⚠️ IMPORTANT**: Keep your `.env` file secret! It's already in `.gitignore`.
 
-Instead of hardcoding the token, create a `.env` file:
+### Environment Variables
 
-```env
-DISCORD_TOKEN=your_token_here
-CHANNEL_ID=123456789012345678
-```
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `DISCORD_TOKEN` | ✅ Yes | - | Your Discord bot token |
+| `CHANNEL_ID` | ✅ Yes | - | Discord channel ID for posting |
+| `RUN_TIME_HOUR` | No | 8 | Hour to run (0-23, 24-hour format) |
+| `RUN_TIME_MINUTE` | No | 0 | Minute to run (0-59) |
+| `SCRIPT_PATH` | No | house_duties.py | Path to scheduler script |
+| `PYTHON_CMD` | No | python | Python command to execute |
 
-Then install `python-dotenv`:
-```powershell
-pip install python-dotenv
-```
-
-And modify `discord_bot.py` to load from `.env`:
-```python
-from dotenv import load_dotenv
-load_dotenv()
-
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
-```
+**Examples:**
+- Run at 9:30 AM: `RUN_TIME_HOUR=9` and `RUN_TIME_MINUTE=30`
+- Run at 8:00 PM: `RUN_TIME_HOUR=20` and `RUN_TIME_MINUTE=0`
+- Use Python 3.12: `PYTHON_CMD=python3.12`
 
 ## Step 6: Run the Bot
 
