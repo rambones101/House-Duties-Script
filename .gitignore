@@ -38,8 +38,7 @@ Thumbs.db
 *.bak
 *.corrupt.bak
 
-# Generated files (optional - uncomment if you don't want to track these)
-schedule.csv
-schedule.json
-chore_state.json
-brothers.txt
+# Generated data files (tracked in data/ directory now)
+data/schedule.csv
+data/schedule.json
+data/chore_state.json

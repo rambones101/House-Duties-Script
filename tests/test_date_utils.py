@@ -7,7 +7,7 @@ import os
 # Add parent directory to path to import house_duties
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from house_duties_legacy import (
+from house_duties.utils import (
     most_recent_sunday,
     parse_start_sunday,
     week_start_for,

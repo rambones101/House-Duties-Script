@@ -5,10 +5,12 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from house_duties_legacy import (
+from house_duties.state import (
     load_brothers,
     load_constraints,
-    load_categories,
+    load_categories
+)
+from house_duties.assignment import (
     is_banned,
     preference_bonus
 )

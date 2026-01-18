@@ -1,166 +1,198 @@
 # House Duties Scheduler
 
-A fraternity house chore scheduling system with persistent state tracking, fairness algorithms, and deck-based organization. Automatically assigns weekly chores to brothers while maintaining historical equity and respecting constraints.
+A modular chore scheduling system with persistent state tracking, fairness algorithms, and deck-based organization. Designed for fraternity houses but adaptable to any shared living situation.
 
-## Features
+## 🏗️ Project Structure
 
-- **Persistent State Management**: Tracks rotation history and assignment counts across weeks
-- **Fairness Algorithm**: Distributes workload evenly with penalties for repeat assignments
-- **Flexible Scheduling**: Supports weekly, biweekly, and n-times-per-week task cadences
-- **Biweekly Parity System**: Maintains odd/even week rotation tracking from anchor Sunday
-- **Bonus Task Selection**: Dynamically assigns 2-3 cleanings/week based on roster size
-- **Constraint Support**: Handles opt-outs, category bans, and task-specific restrictions
-- **Data Validation**: Comprehensive input validation for brothers, tasks, and constraints
-- **Environment Variable Configuration**: Secure configuration via .env files for Discord bot
-- **Discord Bot Integration**: Optional bot for posting schedules and sending reminders
-
-## Quick Start
-
-### Prerequisites
-
-- Python 3.7+
-- Required packages: `pip install -r requirements.txt`
-
-### Basic Usage
-
-1. Update [brothers.txt](brothers.txt) with active roster (one name per line)
-2. Run the scheduler:
-```powershell
-python house_duties.py
+```
+House Duties Script/
+├── config/                      # Configuration files
+│   ├── brothers.txt            # Active roster (one name per line)
+│   └── brother_categories.json # Brother preferences (optional)
+│
+├── data/                        # Data files (generated)
+│   ├── chore_state.json        # Persistent state tracking
+│   ├── schedule.csv            # Current schedule (CSV format)
+│   └── schedule.json           # Current schedule (JSON format)
+│
+├── docs/                        # Documentation
+│   ├── ARCHITECTURE.md         # System architecture details
+│   ├── DISCORD_BOT_SETUP.md    # Bot setup instructions
+│   └── VALIDATION.md           # Validation procedures
+│
+├── house_duties/                # Main scheduler package
+│   ├── __init__.py             # Package exports
+│   ├── assignment.py           # Fairness-based assignment logic
+│   ├── bonus.py                # Bonus 3rd cleaning selection
+│   ├── cli.py                  # Command-line interface
+│   ├── models.py               # Data models (TaskTemplate, Occurrence)
+│   ├── output.py               # CSV/JSON output formatting
+│   ├── scheduler.py            # Template expansion logic
+│   ├── state.py                # State persistence
+│   ├── templates.py            # Task definitions by deck
+│   ├── utils.py                # Date/time utilities
+│   └── validation.py           # Input validation
+│
+├── discord_bot/                 # Discord bot package
+│   ├── __init__.py             # Package exports
+│   ├── bot.py                  # Main bot instance
+│   ├── commands.py             # Bot commands
+│   ├── config.py               # Configuration management
+│   ├── embeds.py               # Message formatting
+│   └── scheduler.py            # Schedule execution
+│
+├── tests/                       # Test suite
+│   ├── conftest.py             # Test fixtures
+│   ├── test_assignment.py
+│   ├── test_bonus.py
+│   ├── test_cli.py
+│   └── ...
+│
+├── house_duties.py              # Main entry point
+├── discord_bot.py               # Discord bot entry point
+├── house_duties_legacy.py       # Legacy monolithic version (backup)
+├── .env.example                 # Environment variables template
+├── .gitignore                   # Git ignore rules
+├── pytest.ini                   # Test configuration
+├── requirements.txt             # Python dependencies
+└── README.md                    # This file
 ```
 
-### Command-Line Options
+## 🚀 Quick Start
 
-The scheduler supports extensive CLI configuration:
+### Installation
 
-```powershell
-# Basic usage with defaults
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd "House Duties Script"
+   ```
+
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Configure roster**
+   ```bash
+   # Edit config/brothers.txt - one name per line
+   John Smith
+   Jane Doe
+   # Comments start with #
+   ```
+
+4. **Run the scheduler**
+   ```bash
+   python house_duties.py
+   ```
+
+   Output will be saved to:
+   - `data/schedule.csv` - Spreadsheet format
+   - `data/schedule.json` - Machine-readable format
+   - Terminal output - Organized by deck and date
+
+## 📋 Usage
+
+### Basic Commands
+
+```bash
+# Generate 1 week schedule (auto-detect Sunday)
 python house_duties.py
 
-# Generate 2 weeks starting from specific date
-python house_duties.py --weeks 2 --start-date 2026-01-19
+# Generate 2 weeks
+python house_duties.py --weeks 2
 
-# Use custom input files
-python house_duties.py --roster my_brothers.txt --constraints my_rules.json
+# Start from specific Sunday
+python house_duties.py --start 2026-01-19
 
-# Preview schedule without saving (dry run)
+# Preview without saving state
 python house_duties.py --dry-run
 
-# Save outputs to specific directory
-python house_duties.py --output-dir ./schedules/
-
-# Verbose logging for debugging
-python house_duties.py -v
-
-# Quiet mode (errors only)
-python house_duties.py -q
-
-# See all available options
-python house_duties.py --help
+# Verbose debug logging
+python house_duties.py --verbose
 ```
 
-**Available Arguments:**
-- `--roster FILE` - Path to brothers roster file (default: brothers.txt)
-- `--constraints FILE` - Path to constraints file (default: constraints.json)
-- `--categories FILE` - Path to categories file (default: brother_categories.json)
-- `--state FILE` - Path to state file (default: chore_state.json)
-- `--weeks N` - Number of weeks to generate (default: 1)
-- `--start-date YYYY-MM-DD` - Start date (default: auto-detect most recent Sunday)
-- `--output-dir DIR` - Directory for output files (default: current directory)
-- `--output-csv FILE` - Custom name for CSV output (default: schedule.csv)
-- `--output-json FILE` - Custom name for JSON output (default: schedule.json)
-- `--dry-run` - Preview without saving files
-- `--no-display` - Skip terminal display
-- `--ignore-validation-errors` - Continue even if validation fails (not recommended)
-- `-v, --verbose` - Enable DEBUG logging
-- `-q, --quiet` - Only show errors
-- `--log-file FILE` - Custom log file path (default: house_duties.log)
-- `--version` - Show version number
+### Advanced Options
 
-The script will:
-- Auto-detect the most recent Sunday
-- Generate assignments for the upcoming week
-- Output schedule to CSV, JSON, and terminal
-- Update persistent state in [chore_state.json](chore_state.json)
+```bash
+# Custom file paths
+python house_duties.py \
+  --brothers config/brothers.txt \
+  --state data/chore_state.json \
+  --categories config/brother_categories.json \
+  --output-csv data/schedule.csv \
+  --output-json data/schedule.json
 
-## Project Structure
+# Custom seed for different tie-breaking
+python house_duties.py --seed 123
 
-### Core Files
-
-- **[house_duties.py](house_duties.py)**: Main scheduler application (~750 lines)
-- **[brothers.txt](brothers.txt)**: Active roster (one name per line, use `#` for comments)
-- **[chore_state.json](chore_state.json)**: Persistent state tracking
-  - `anchor_sunday`: Reference date for biweekly parity
-  - `bonus_counts`: Tracks bonus task assignment history
-  - `brother_task_counts`: Historical assignment counts per brother-task pair
-  - `brother_last_week_tasks`: Recent week assignments for penalty calculation
-
-### Output Files
-
-- **[schedule.csv](schedule.csv)**: Sortable schedule by deck and due date
-- **[schedule.json](schedule.json)**: Machine-readable assignment data for integrations
-
-### Optional Files
-
-- **constraints.json**: Define opt-outs, category bans, and preferences (see Configuration section)
-- **[brother_categories.json](brother_categories.json)**: Brother category preferences
-
-## How It Works
-
-### Core Pipeline
-
-1. **Load State** → Read persistent tracking from `chore_state.json`
-2. **Build Templates** → Define hardcoded task definitions with deck assignments
-3. **Expand Occurrences** → Generate concrete chore instances for the week
-4. **Assign Brothers** → Use constraint-based greedy algorithm with fairness penalties
-5. **Save Outputs** → Write `schedule.csv`, `schedule.json`, and updated state
-
-### Task Template Structure
-
-```python
-TaskTemplate(
-    key="SD_SINKS",                          # Unique identifier
-    deck="Second Deck",                       # Zero/First/Second/Third/Other
-    label="Sinks Clean/Sweep Bathroom",
-    category="bathrooms",                     # k&m, bathrooms, floors, laundry, common, other
-    people_needed=2,
-    cadence="n_per_week",                     # weekly, biweekly, n_per_week
-    times_per_week=2,                         # Only for n_per_week cadence
-    preferred_days=[2, 4],                    # 0=Sun, 6=Sat
-    severity=4,                               # 1-5, affects fairness weight
-    effort_multiplier=1.1,                    # Weight adjustment
-    flexible_2_3x=True                        # Enable bonus 3rd cleaning
-)
+# Adjust minimum roster for bonus cleanings
+python house_duties.py --min-bonus-roster 12
 ```
+
+## 🤖 Discord Bot
+
+### Setup
+
+1. **Create `.env` file from template**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Configure environment variables**
+   ```env
+   DISCORD_TOKEN=your_bot_token_here
+   CHANNEL_ID=123456789012345678
+   RUN_TIME_HOUR=8
+   RUN_TIME_MINUTE=0
+   SCRIPT_PATH=house_duties.py
+   PYTHON_CMD=python
+   ```
+
+3. **Run the bot**
+   ```bash
+   python discord_bot.py
+   ```
+
+### Bot Commands
+
+| Command | Description | Permissions |
+|---------|-------------|-------------|
+| `!run-schedule` | Manually trigger scheduler | Admin only |
+| `!my-chores [@member]` | View assigned chores | Everyone |
+| `!chores-today` | View today's chores | Everyone |
+| `!ping` | Check bot status | Everyone |
+
+## 🧠 Key Concepts
 
 ### Fairness Algorithm
 
-Brother selection uses tuple sorting to minimize:
-- **Repeat penalty** (1.50×): Discourages assigning same task repeatedly
-- **Recent week penalty** (0.60×): Avoids back-to-back weeks on same task  
-- **Same-day penalty** (0.75×): Spreads chores across days
-- **Preference bonus** (-0.35): Rewards preferred category assignments
+The scheduler uses a multi-factor scoring system to ensure equitable distribution:
 
-Lower scores are assigned first, ensuring equitable distribution over time.
+- **Base Load**: Cumulative task weight (severity × effort_multiplier)
+- **Repeat Penalty** (×1.50): Discourages same task assignment
+- **Recent Penalty** (×0.60): Avoids back-to-back weeks on same task
+- **Day Penalty** (×0.75): Spreads chores across days
+- **Preference Bonus** (-0.35): Rewards preferred categories
 
-### Bonus Third Cleaning System
+Lower scores are assigned first.
 
-Tasks marked `flexible_2_3x=True` can receive a 3rd weekly cleaning when roster ≥ 14 brothers:
-- Uses deterministic seeding for reproducibility
-- Priority: bathrooms > floors > common areas
-- Tracks `bonus_counts` to rotate fairly across eligible tasks
+### Biweekly Parity
 
-## Configuration
+Tasks like "Brasso" and "Blue" alternate between odd/even weeks based on `anchor_sunday` in state file. **Never modify the anchor** unless intentionally resetting the rotation cycle.
 
-### Task Cadences
+### Bonus Third Cleaning
 
-- **`"weekly"`**: Fixed days every week (e.g., Sunday/Wednesday)
-- **`"biweekly"`**: Alternates odd/even weeks from anchor Sunday
-- **`"n_per_week"`**: Rotating days (2-3 times per week)
+Tasks marked `flexible_2_3x=True` can get a 3rd cleaning when roster ≥ `BONUS_THIRD_CLEANING_MIN_ROSTER` (default 14). Selection uses deterministic algorithm favoring:
+1. High-priority categories (bathrooms > floors > common)
+2. Tasks with fewer historical bonus counts
+3. Stable hash for reproducibility
+
+## ⚙️ Configuration
 
 ### Constraints File (Optional)
 
-Create `constraints.json` to customize assignments:
+Create `constraints.json`:
 
 ```json
 {
@@ -180,196 +212,81 @@ Create `constraints.json` to customize assignments:
 }
 ```
 
-### Configuration Constants
+### Adding New Tasks
 
-Edit constants at the top of [house_duties.py](house_duties.py):
+Edit `house_duties/templates.py`:
 
-- `START_SUNDAY`: Leave `""` to auto-detect (recommended)
-- `WEEKS_TO_GENERATE`: Typically `1` for weekly runs
-- `BONUS_THIRD_CLEANING_MIN_ROSTER`: Minimum roster for 3rd cleanings (default: 14)
-- `RANDOM_SEED`: Change to alter tie-breaking randomness
-
-## Discord Bot (Optional)
-
-Post schedules automatically to Discord with reminders. Configuration is managed through environment variables for security.
-
-### Quick Setup
-
-1. **Create bot**: Follow [DISCORD_BOT_SETUP.md](DISCORD_BOT_SETUP.md) for Discord bot creation
-2. **Configure**: Copy `.env.example` to `.env` and fill in your values:
-   ```bash
-   cp .env.example .env
-   # Edit .env with your Discord token and channel ID
-   ```
-3. **Run**: `python discord_bot.py`
-
-### Environment Variables
-
-The bot uses these environment variables from `.env`:
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `DISCORD_TOKEN` | ✅ Yes | - | Your Discord bot token |
-| `CHANNEL_ID` | ✅ Yes | - | Discord channel ID for posting |
-| `RUN_TIME_HOUR` | No | 8 | Hour to run (0-23, 24-hour format) |
-| `RUN_TIME_MINUTE` | No | 0 | Minute to run (0-59) |
-| `SCRIPT_PATH` | No | house_duties.py | Path to scheduler script |
-| `PYTHON_CMD` | No | python | Python command to execute |
-| `MAX_RETRIES` | No | 3 | Maximum retry attempts on failure |
-| `RETRY_DELAY` | No | 5 | Seconds to wait between retries |
-
-**Security Note:** `.env` is in `.gitignore` and never committed to version control.
-
-### Bot Commands
-
-The bot provides several interactive commands:
-
-| Command | Permission | Description |
-|---------|-----------|-------------|
-| `!run-schedule` | Admin | Manually trigger schedule generation |
-| `!my-chores [@user]` | Everyone | View your assigned chores for the week |
-| `!chores-today` | Everyone | View all chores due today |
-| `!ping` | Everyone | Check bot status and latency |
-
-**Examples:**
-```
-!run-schedule          # Generate schedule now (admin only)
-!my-chores            # See your own chores
-!my-chores @John      # See John's chores
-!chores-today         # See today's chores
-!ping                 # Check if bot is online
+```python
+TaskTemplate(
+    key="NEW_TASK",              # Unique identifier
+    deck="Second Deck",          # Zero/First/Second/Third/Other
+    label="My New Task",
+    category="bathrooms",        # k&m, bathrooms, floors, laundry, common, other
+    people_needed=2,
+    cadence="n_per_week",        # weekly, biweekly, n_per_week
+    times_per_week=2,
+    preferred_days=[2, 4],       # 0=Sun, 6=Sat
+    severity=4,                  # 1-5 scale
+    effort_multiplier=1.1,
+    flexible_2_3x=True           # Enable bonus 3rd cleaning
+)
 ```
 
-### Features
+## 🧪 Testing
 
-- **Rich Embeds**: Beautiful formatting with colors and organization
-- **Retry Logic**: Automatically retries failed schedule generation (3 attempts)
-- **Error Handling**: Clear error messages with troubleshooting tips
-- **Query Commands**: Check your chores without pinging everyone
-- **Status Indicators**: Visual feedback during schedule generation
-
-See [DISCORD_BOT_SETUP.md](DISCORD_BOT_SETUP.md) for detailed configuration.
-
-## Data Validation
-
-The scheduler automatically validates all inputs before generating the schedule:
-
-### Brother Validation
-- **Duplicates**: Case-insensitive duplicate detection
-- **Empty names**: Catches empty strings and whitespace-only names
-- **Type checking**: Ensures all entries are valid strings
-- **Warnings**: Alerts for very short names or special characters
-
-### Task Template Validation
-- **Required fields**: Validates all mandatory attributes (key, label, deck, category, etc.)
-- **Valid categories**: Ensures category is one of: k&m, bathrooms, floors, laundry, common, other
-- **Cadence rules**: Validates cadence-specific requirements
-  - `n_per_week` must have `times_per_week` (1-7)
-  - Day values must be 0-6 (Sunday-Saturday)
-- **Duplicate keys**: Prevents conflicting task identifiers
-- **Severity and effort**: Validates numeric ranges (severity: 1-5, effort_multiplier > 0)
-
-### Constraint Validation
-- **Brother references**: Ensures all names in constraints exist in roster
-- **Category names**: Validates category names in bans/preferences
-- **Numeric constraints**: Checks max_per_brother_per_week/day are positive
-- **Logical checks**: Prevents exempting entire roster
-
-### Handling Validation Errors
-
-By default, validation errors stop execution:
-```powershell
-python house_duties.py
-# ERROR: Duplicate brother names found: john
-```
-
-To continue despite validation errors (not recommended):
-```powershell
-python house_duties.py --ignore-validation-errors
-# WARNING: Continuing with invalid data
-```
-
-**Best Practice**: Fix validation errors rather than ignoring them to ensure fair and correct scheduling.
-
-## Common Workflows
-
-### Running Tests
-
-The project includes a comprehensive test suite with 108 tests covering core functionality:
-
-```powershell
-# Install test dependencies
-pip install -r requirements.txt
-
+```bash
 # Run all tests
 pytest
 
-# Run specific test file
-pytest tests/test_date_utils.py
-
-# Run with verbose output
-pytest -v
-
-# Run only unit tests (fast, no file I/O)
-pytest -m unit
-
-# Run only integration tests
-pytest -m integration
-
-# See test coverage (requires pytest-cov)
+# Run with coverage
 pytest --cov=house_duties --cov-report=html
+
+# Run specific test file
+pytest tests/test_assignment.py -v
+
+# Run specific test
+pytest tests/test_bonus.py::test_bonus_selection -v
 ```
 
-**Test Coverage:**
-- Date and time utilities (15 tests)
-- State management and persistence (8 tests)
-- Roster and constraints loading (14 tests)
-- Bonus task selection algorithm (10 tests)
-- CLI argument parsing (7 tests)
-- Data validation (42 tests)
-- Discord bot configuration (12 tests)
+## 📦 Dependencies
 
-### Adding New Tasks
+- **Python 3.8+**
+- `discord.py` - Discord bot integration
+- `python-dotenv` - Environment variable management
+- `pytest` - Testing framework (dev)
 
-1. Add to `build_templates()` in [house_duties.py](house_duties.py), grouped by deck
-2. Choose appropriate cadence type
-3. Set `flexible_2_3x=True` for high-traffic areas needing variable frequency
+## 🔄 Migration from Legacy
 
-### Resetting Rotation History
+The original monolithic `house_duties_legacy.py` has been refactored into modular packages. The legacy file is retained for reference but is no longer used.
 
-Delete or rename `chore_state.json`. Next run will create fresh state with new anchor Sunday.
+**Benefits of new structure:**
+- ✅ Easier testing and maintenance
+- ✅ Better code organization
+- ✅ Clearer separation of concerns
+- ✅ Reusable components
+- ✅ Improved documentation
 
-### Testing Fairness Changes
+## 🤝 Contributing
 
-1. Back up `chore_state.json`
-2. Modify penalty constants at top of [house_duties.py](house_duties.py)
-3. Run scheduler multiple times with same roster
-4. Analyze `brother_task_counts` distribution in state file
-5. Restore backup if results degrade
+1. Make changes in feature branch
+2. Add/update tests
+3. Run test suite: `pytest`
+4. Update documentation
+5. Submit pull request
 
-## Output Format
+## 📝 License
 
-### Terminal
-Deck-organized schedule grouped by date → deck (Zero/First/Second/Third order) → tasks with assigned brothers.
+Internal fraternity use. All rights reserved.
 
-### CSV ([schedule.csv](schedule.csv))
-Sorted by deck, then due date.  
-Columns: `due, deck, task_key, task, category, people_needed, assigned, weight_total`
+## 📞 Support
 
-### JSON ([schedule.json](schedule.json))
-Array of assignment objects for machine-readable integrations.
+For questions or issues:
+- Check `docs/` for detailed documentation
+- Review test files for usage examples
+- Contact system administrator
 
-## Important Notes
+---
 
-- **Never modify `anchor_sunday`** in state file — breaks biweekly parity tracking
-- **Keep `RANDOM_SEED` constant** during semester — changes alter fairness trajectory
-- **Let algorithm manage `bonus_counts`** — manual edits defeat rotation equity
-- **Always assign tasks to a deck** — required for proper output grouping
-
-## License
-
-MIT License - Feel free to adapt for your organization's needs.
-
-## Contributing
-
-Pull requests welcome! Please maintain the existing fairness algorithm behavior and add tests for new features.
+**Last Updated**: January 2026  
+**Version**: 1.2.0  
+**Maintainer**: House Duties Committee

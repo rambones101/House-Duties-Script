@@ -1,20 +1,15 @@
+#!/usr/bin/env python3
 """
-Discord Bot for House Duties Scheduler
-Automatically runs the scheduler every Sunday and posts to a Discord channel.
-Features: Embeds, retry logic, query commands, manual triggers.
+Discord Bot for House Duties Scheduler - Main Entry Point
+
+This is a thin wrapper that uses the modular discord_bot package.
+For the implementation, see discord_bot/ directory.
 """
 
-import discord
-from discord.ext import commands, tasks
-import asyncio
-import subprocess
-import json
-from datetime import datetime, time as dt_time, date as dt_date, timedelta
-import os
-from typing import Optional, List, Dict
-from dotenv import load_dotenv
+from discord_bot import run_bot
 
-load_dotenv()
+if __name__ == "__main__":
+    run_bot()
 
 # ===== CONFIGURATION =====
 # Load from environment variables with defaults
