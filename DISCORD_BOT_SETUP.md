@@ -103,17 +103,74 @@ nohup python discord_bot.py > bot.log 2>&1 &
 
 ## Step 7: Test the Bot
 
-In Discord, type:
+In Discord, try these commands:
+
+### Check Bot Status
 ```
 !ping
 ```
+The bot should respond with status, latency, and schedule availability.
 
-The bot should respond with "🏓 Pong!"
+### Manual Schedule Generation (Admin Only)
+```
+!run-schedule
+```
+Manually trigger schedule generation without waiting for Sunday.
 
-To manually trigger the schedule (admin only):
+### Query Your Chores
 ```
-!runduries
+!my-chores
 ```
+View all chores assigned to you this week.
+
+### View Today's Chores
+```
+!chores-today
+```
+See all chores due today.
+
+### Get Help
+```
+!help
+```
+List all available commands.
+
+## Bot Commands Reference
+
+| Command | Permission | Description |
+|---------|-----------|-------------|
+| `!ping` | Everyone | Check bot status and latency |
+| `!run-schedule` | Admin | Manually generate schedule |
+| `!my-chores [@user]` | Everyone | View chores for yourself or another member |
+| `!chores-today` | Everyone | View all chores due today |
+| `!help [command]` | Everyone | Show help for commands |
+
+## Features
+
+### 🎨 Rich Embeds
+The bot uses Discord embeds for beautiful, organized schedule display with:
+- Color-coded sections
+- Organized by date and deck
+- Visual indicators for status
+
+### 🔄 Retry Logic
+Automatically retries failed schedule generation:
+- Up to 3 attempts (configurable via `MAX_RETRIES`)
+- 5-second delay between retries (configurable via `RETRY_DELAY`)
+- Clear error messages with troubleshooting tips
+
+### 🔍 Query Commands
+Members can check their chores without administrator intervention:
+- View personal assignments
+- Check today's schedule
+- Look up other members' chores
+
+### ⚠️ Error Handling
+Comprehensive error handling with:
+- Permission checks
+- Clear error messages
+- Automatic retry on transient failures
+- Timeout protection (60 seconds)
 
 ## Troubleshooting
 

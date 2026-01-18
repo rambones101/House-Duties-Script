@@ -1,10 +1,10 @@
 """
-Tests for Discord bot environment configuration.
+Tests for Discord bot environment configuration and functionality.
 """
 
 import pytest
 import os
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 
 def test_discord_bot_imports():
@@ -20,7 +20,9 @@ def test_discord_bot_imports():
     "DISCORD_TOKEN": "test_token_12345",
     "CHANNEL_ID": "123456789",
     "RUN_TIME_HOUR": "10",
-    "RUN_TIME_MINUTE": "30"
+    "RUN_TIME_MINUTE": "30",
+    "MAX_RETRIES": "5",
+    "RETRY_DELAY": "10"
 })
 def test_env_variables_loaded():
     """Test that environment variables are loaded correctly."""
@@ -39,6 +41,8 @@ def test_env_variables_loaded():
         assert discord_bot.CHANNEL_ID == 123456789
         assert discord_bot.RUN_TIME_HOUR == 10
         assert discord_bot.RUN_TIME_MINUTE == 30
+        assert discord_bot.MAX_RETRIES == 5
+        assert discord_bot.RETRY_DELAY == 10
     except ImportError:
         pytest.skip("Discord bot dependencies not available")
 
@@ -61,6 +65,8 @@ def test_env_defaults():
         assert discord_bot.RUN_TIME_MINUTE == 0
         assert discord_bot.SCRIPT_PATH == "house_duties.py"
         assert discord_bot.PYTHON_CMD == "python"
+        assert discord_bot.MAX_RETRIES == 3
+        assert discord_bot.RETRY_DELAY == 5
     except ImportError:
         pytest.skip("Discord bot dependencies not available")
 
@@ -162,7 +168,7 @@ def test_env_example_has_required_vars():
         content = f.read()
     
     required_vars = ["DISCORD_TOKEN", "CHANNEL_ID"]
-    optional_vars = ["RUN_TIME_HOUR", "RUN_TIME_MINUTE", "SCRIPT_PATH", "PYTHON_CMD"]
+    optional_vars = ["RUN_TIME_HOUR", "RUN_TIME_MINUTE", "SCRIPT_PATH", "PYTHON_CMD", "MAX_RETRIES", "RETRY_DELAY"]
     
     for var in required_vars:
         assert var in content, f".env.example should document {var}"
@@ -179,3 +185,42 @@ def test_gitignore_has_env():
         assert ".env" in content, ".env should be in .gitignore"
     except FileNotFoundError:
         pytest.skip(".gitignore not found")
+
+
+def test_bot_has_commands():
+    """Test that bot commands are defined."""
+    try:
+        import discord_bot
+        
+        # Check that bot is a Bot instance
+        assert hasattr(discord_bot, 'bot')
+        
+        # Check that commands exist
+        command_names = [cmd.name for cmd in discord_bot.bot.commands]
+        
+        expected_commands = ['run-schedule', 'my-chores', 'chores-today', 'ping']
+        for cmd in expected_commands:
+            assert cmd in command_names, f"Command '{cmd}' should be defined"
+            
+    except ImportError:
+        pytest.skip("Discord bot dependencies not available")
+
+
+def test_color_constants_defined():
+    """Test that color constants for embeds are defined."""
+    try:
+        import discord_bot
+        
+        assert hasattr(discord_bot, 'COLOR_SUCCESS')
+        assert hasattr(discord_bot, 'COLOR_ERROR')
+        assert hasattr(discord_bot, 'COLOR_INFO')
+        assert hasattr(discord_bot, 'COLOR_WARNING')
+        
+        # Check that they are integers (color values)
+        assert isinstance(discord_bot.COLOR_SUCCESS, int)
+        assert isinstance(discord_bot.COLOR_ERROR, int)
+        assert isinstance(discord_bot.COLOR_INFO, int)
+        assert isinstance(discord_bot.COLOR_WARNING, int)
+        
+    except ImportError:
+        pytest.skip("Discord bot dependencies not available")

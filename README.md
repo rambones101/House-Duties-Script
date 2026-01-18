@@ -215,8 +215,38 @@ The bot uses these environment variables from `.env`:
 | `RUN_TIME_MINUTE` | No | 0 | Minute to run (0-59) |
 | `SCRIPT_PATH` | No | house_duties.py | Path to scheduler script |
 | `PYTHON_CMD` | No | python | Python command to execute |
+| `MAX_RETRIES` | No | 3 | Maximum retry attempts on failure |
+| `RETRY_DELAY` | No | 5 | Seconds to wait between retries |
 
 **Security Note:** `.env` is in `.gitignore` and never committed to version control.
+
+### Bot Commands
+
+The bot provides several interactive commands:
+
+| Command | Permission | Description |
+|---------|-----------|-------------|
+| `!run-schedule` | Admin | Manually trigger schedule generation |
+| `!my-chores [@user]` | Everyone | View your assigned chores for the week |
+| `!chores-today` | Everyone | View all chores due today |
+| `!ping` | Everyone | Check bot status and latency |
+
+**Examples:**
+```
+!run-schedule          # Generate schedule now (admin only)
+!my-chores            # See your own chores
+!my-chores @John      # See John's chores
+!chores-today         # See today's chores
+!ping                 # Check if bot is online
+```
+
+### Features
+
+- **Rich Embeds**: Beautiful formatting with colors and organization
+- **Retry Logic**: Automatically retries failed schedule generation (3 attempts)
+- **Error Handling**: Clear error messages with troubleshooting tips
+- **Query Commands**: Check your chores without pinging everyone
+- **Status Indicators**: Visual feedback during schedule generation
 
 See [DISCORD_BOT_SETUP.md](DISCORD_BOT_SETUP.md) for detailed configuration.
 
