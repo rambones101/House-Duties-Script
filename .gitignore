@@ -23,6 +23,14 @@ ENV/
 .DS_Store
 Thumbs.db
 
+# Logs
+*.log
+*.log.*
+
+# State backups
+*.bak
+*.corrupt.bak
+
 # Generated files (optional - uncomment if you don't want to track these)
 # schedule.csv
 # schedule.json

@@ -30,6 +30,9 @@ import random
 from collections import defaultdict
 import os
 import hashlib
+import logging
+import sys
+from pathlib import Path
 
 # =========================
 # CONFIG — EDIT THIS PART
@@ -91,6 +94,17 @@ DECK_ORDER = ["Zero Deck", "First Deck", "Second Deck", "Third Deck", "Other"]
 # INTERNALS — DON'T EDIT
 # =========================
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler('house_duties.log', mode='a')
+    ]
+)
+logger = logging.getLogger(__name__)
+
 DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
 
@@ -150,14 +164,56 @@ def unique_sorted_days(days: List[int]) -> List[int]:
 # -------------------------
 
 def load_state(filepath: str) -> Dict[str, Any]:
+    """Load persistent state from JSON file with error handling."""
     if not os.path.exists(filepath):
+        logger.info(f"State file '{filepath}' not found. Starting with empty state.")
         return {}
-    with open(filepath, "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            state = json.load(f)
+            logger.info(f"Loaded state from '{filepath}'")
+            return state
+    except json.JSONDecodeError as e:
+        logger.error(f"Invalid JSON in state file '{filepath}': {e}")
+        logger.warning("Starting with empty state. Previous state will be backed up.")
+        # Backup corrupted file
+        backup_path = f"{filepath}.corrupt.bak"
+        try:
+            os.rename(filepath, backup_path)
+            logger.info(f"Corrupted state backed up to '{backup_path}'")
+        except OSError:
+            pass
+        return {}
+    except Exception as e:
+        logger.error(f"Error reading state file '{filepath}': {e}")
+        raise
 
 def save_state(filepath: str, state: Dict[str, Any]) -> None:
-    with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(state, f, indent=2)
+    """Save persistent state to JSON file with error handling and backup."""
+    try:
+        # Validate state before saving
+        if not isinstance(state, dict):
+            raise ValueError(f"State must be a dictionary, got {type(state)}")
+        
+        # Create backup of existing state
+        if os.path.exists(filepath):
+            backup_path = f"{filepath}.bak"
+            try:
+                with open(filepath, "r", encoding="utf-8") as f:
+                    backup_state = json.load(f)
+                with open(backup_path, "w", encoding="utf-8") as f:
+                    json.dump(backup_state, f, indent=2)
+                logger.debug(f"Created backup at '{backup_path}'")
+            except Exception as e:
+                logger.warning(f"Could not create backup: {e}")
+        
+        # Write new state
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(state, f, indent=2)
+        logger.info(f"Saved state to '{filepath}'")
+    except Exception as e:
+        logger.error(f"Error saving state to '{filepath}': {e}")
+        raise
 
 def get_anchor_sunday(state: Dict[str, Any], current_sunday: date) -> date:
     anchor = state.get("anchor_sunday")
@@ -175,35 +231,83 @@ def week_index_from_anchor(anchor_sunday: date, current_sunday: date) -> int:
 # -------------------------
 
 def load_brothers(filepath: str) -> List[str]:
+    """Load brother roster from file with validation and error handling."""
     if not os.path.exists(filepath):
+        logger.error(f"Roster file '{filepath}' not found")
         raise FileNotFoundError(
             f"Missing roster file: {filepath}\n"
             "Create brothers.txt with one brother name per line."
         )
-    brothers: List[str] = []
-    with open(filepath, "r", encoding="utf-8") as f:
-        for line in f:
-            name = line.strip()
-            if name and not name.startswith("#"):
-                brothers.append(name)
-    if not brothers:
-        raise ValueError("Roster file is empty. Add at least one brother name.")
-    seen = set()
-    out = []
-    for b in brothers:
-        if b not in seen:
-            out.append(b)
-            seen.add(b)
-    return out
+    
+    try:
+        brothers: List[str] = []
+        with open(filepath, "r", encoding="utf-8") as f:
+            for line_num, line in enumerate(f, 1):
+                name = line.strip()
+                if name and not name.startswith("#"):
+                    # Validate name
+                    if len(name) > 100:
+                        logger.warning(f"Line {line_num}: Name too long (truncating): {name[:50]}...")
+                        name = name[:100]
+                    if not name.replace(' ', '').replace('-', '').replace("'", '').isalnum():
+                        logger.warning(f"Line {line_num}: Name contains unusual characters: {name}")
+                    brothers.append(name)
+        
+        if not brothers:
+            logger.error(f"Roster file '{filepath}' is empty or contains only comments")
+            raise ValueError("Roster file is empty. Add at least one brother name.")
+        
+        # Remove duplicates while preserving order
+        seen = set()
+        out = []
+        for b in brothers:
+            if b not in seen:
+                out.append(b)
+                seen.add(b)
+            else:
+                logger.warning(f"Duplicate brother name removed: {b}")
+        
+        logger.info(f"Loaded {len(out)} brothers from '{filepath}'")
+        return out
+    
+    except UnicodeDecodeError as e:
+        logger.error(f"File encoding error in '{filepath}': {e}")
+        raise ValueError(f"Could not read '{filepath}'. Ensure it's saved as UTF-8 text.") from e
+    except Exception as e:
+        logger.error(f"Error loading brothers from '{filepath}': {e}")
+        raise
 
 
 def load_categories(filepath: str) -> Dict[str, List[str]]:
-    """Load brother categories for pairing rules (e.g., actives, junior_actives)"""
+    """Load brother categories for pairing rules with error handling."""
     if not os.path.exists(filepath):
+        logger.debug(f"Categories file '{filepath}' not found. Using empty categories.")
         return {"actives": [], "junior_actives": []}
-    with open(filepath, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return data
+    
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        
+        # Validate structure
+        if not isinstance(data, dict):
+            logger.warning(f"Invalid categories file format. Expected dict, got {type(data)}")
+            return {"actives": [], "junior_actives": []}
+        
+        # Ensure all values are lists
+        for key, value in data.items():
+            if not isinstance(value, list):
+                logger.warning(f"Category '{key}' is not a list, converting")
+                data[key] = list(value) if hasattr(value, '__iter__') else []
+        
+        logger.info(f"Loaded categories from '{filepath}'")
+        return data
+    
+    except json.JSONDecodeError as e:
+        logger.error(f"Invalid JSON in categories file '{filepath}': {e}")
+        return {"actives": [], "junior_actives": []}
+    except Exception as e:
+        logger.error(f"Error loading categories from '{filepath}': {e}")
+        return {"actives": [], "junior_actives": []}
 
 
 # -------------------------
@@ -222,13 +326,44 @@ DEFAULT_CONSTRAINTS = {
 }
 
 def load_constraints(filepath: str) -> Dict[str, Any]:
+    """Load constraints file with validation and error handling."""
     if not os.path.exists(filepath):
+        logger.debug(f"Constraints file '{filepath}' not found. Using defaults.")
         return DEFAULT_CONSTRAINTS.copy()
-    with open(filepath, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    merged = DEFAULT_CONSTRAINTS.copy()
-    merged.update(data or {})
-    return merged
+    
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        
+        if not isinstance(data, dict):
+            logger.warning(f"Invalid constraints format. Expected dict, got {type(data)}")
+            return DEFAULT_CONSTRAINTS.copy()
+        
+        merged = DEFAULT_CONSTRAINTS.copy()
+        merged.update(data or {})
+        
+        # Validate numeric constraints
+        for key in ['max_per_brother_per_week', 'max_per_brother_per_day', 'min_per_brother_per_week']:
+            if key in merged and merged[key] is not None:
+                try:
+                    merged[key] = int(merged[key])
+                    if merged[key] < 0:
+                        logger.warning(f"Constraint '{key}' is negative, ignoring")
+                        merged[key] = None
+                except (ValueError, TypeError):
+                    logger.warning(f"Invalid value for '{key}', ignoring")
+                    merged[key] = None
+        
+        logger.info(f"Loaded constraints from '{filepath}'")
+        return merged
+    
+    except json.JSONDecodeError as e:
+        logger.error(f"Invalid JSON in constraints file '{filepath}': {e}")
+        logger.warning("Using default constraints")
+        return DEFAULT_CONSTRAINTS.copy()
+    except Exception as e:
+        logger.error(f"Error loading constraints from '{filepath}': {e}")
+        return DEFAULT_CONSTRAINTS.copy()
 
 def normalize_set(x) -> Set[str]:
     return set([str(v).strip() for v in (x or []) if str(v).strip()])
@@ -705,8 +840,24 @@ def write_csv(schedule_items: List[Dict[str, Any]], filepath: str):
 
 
 def write_json(schedule_items: List[Dict[str, Any]], filepath: str):
-    with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(schedule_items, f, indent=2)
+    """Write schedule to JSON file with error handling."""
+    try:
+        # Convert datetime objects to ISO format strings
+        serializable_items = []
+        for item in schedule_items:
+            serializable = item.copy()
+            if "due_dt" in serializable and isinstance(serializable["due_dt"], datetime):
+                serializable["due_dt"] = serializable["due_dt"].isoformat()
+            serializable_items.append(serializable)
+        
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(serializable_items, f, indent=2)
+        
+        logger.info(f"Wrote {len(serializable_items)} schedule items to '{filepath}'")
+    
+    except Exception as e:
+        logger.error(f"Error writing JSON to '{filepath}': {e}")
+        raise
 
 
 # -------------------------
@@ -714,49 +865,97 @@ def write_json(schedule_items: List[Dict[str, Any]], filepath: str):
 # -------------------------
 
 def main():
-    brothers = load_brothers(ROSTER_FILE)
-    constraints = load_constraints(CONSTRAINTS_FILE)
-    categories = load_categories(CATEGORIES_FILE)
+    """Main execution function with comprehensive error handling."""
+    try:
+        logger.info("="*60)
+        logger.info("Starting House Duties Scheduler")
+        logger.info("="*60)
+        
+        # Load input files
+        brothers = load_brothers(ROSTER_FILE)
+        constraints = load_constraints(CONSTRAINTS_FILE)
+        categories = load_categories(CATEGORIES_FILE)
 
-    current_sunday = parse_start_sunday(START_SUNDAY)
+        # Calculate dates
+        current_sunday = parse_start_sunday(START_SUNDAY)
+        logger.info(f"Generating schedule for week starting: {current_sunday}")
 
-    state = load_state(STATE_FILE)
-    anchor_sunday = get_anchor_sunday(state, current_sunday)
+        # Load and initialize state
+        state = load_state(STATE_FILE)
+        anchor_sunday = get_anchor_sunday(state, current_sunday)
+        logger.info(f"Using anchor Sunday: {anchor_sunday}")
 
-    templates = build_templates()
+        # Build task templates
+        templates = build_templates()
+        logger.info(f"Built {len(templates)} task templates")
 
-    occs = occurrences_from_templates(
-        templates=templates,
-        anchor_sunday=anchor_sunday,
-        current_sunday=current_sunday,
-        weeks=WEEKS_TO_GENERATE,
-        brothers=brothers,
-        state=state
-    )
+        # Generate occurrences
+        occs = occurrences_from_templates(
+            templates=templates,
+            anchor_sunday=anchor_sunday,
+            current_sunday=current_sunday,
+            weeks=WEEKS_TO_GENERATE,
+            brothers=brothers,
+            state=state
+        )
+        logger.info(f"Generated {len(occs)} task occurrences for {WEEKS_TO_GENERATE} week(s)")
 
-    result = assign_chores(
-        occs=occs,
-        brothers=brothers,
-        state=state,
-        constraints=constraints,
-        current_sunday=current_sunday,
-        categories=categories
-    )
+        # Assign chores
+        result = assign_chores(
+            occs=occs,
+            brothers=brothers,
+            state=state,
+            constraints=constraints,
+            current_sunday=current_sunday,
+            categories=categories
+        )
 
-    schedule_items = result["schedule_items"]
-    state = result["state"]
+        schedule_items = result["schedule_items"]
+        state = result["state"]
+        logger.info(f"Successfully assigned {len(schedule_items)} chores")
 
-    exempt_all = set(constraints.get("exempt_all", []) or [])
-    house_size = len([b for b in brothers if b not in exempt_all])
+        # Calculate house size
+        exempt_all = set(constraints.get("exempt_all", []) or [])
+        house_size = len([b for b in brothers if b not in exempt_all])
+        logger.info(f"Active house size: {house_size} brothers")
 
-    print_schedule_by_deck(schedule_items, current_sunday, anchor_sunday, house_size)
+        # Display schedule
+        print_schedule_by_deck(schedule_items, current_sunday, anchor_sunday, house_size)
 
-    write_csv(schedule_items, "schedule.csv")
-    write_json(schedule_items, "schedule.json")
-    save_state(STATE_FILE, state)
+        # Write output files
+        write_csv(schedule_items, "schedule.csv")
+        write_json(schedule_items, "schedule.json")
+        save_state(STATE_FILE, state)
 
-    print("Saved: schedule.csv, schedule.json, and chore_state.json")
+        logger.info("="*60)
+        logger.info("SUCCESS: Schedule generation completed")
+        logger.info("Saved: schedule.csv, schedule.json, and chore_state.json")
+        logger.info("="*60)
+        
+        # Use ASCII-safe output for Windows terminals
+        try:
+            print("\n✓ Schedule generation completed successfully!\n")
+        except UnicodeEncodeError:
+            print("\n[SUCCESS] Schedule generation completed successfully!\n")
+        
+        return 0
+    
+    except FileNotFoundError as e:
+        logger.error(f"File not found: {e}")
+        print(f"\n❌ ERROR: {e}\n", file=sys.stderr)
+        return 1
+    
+    except ValueError as e:
+        logger.error(f"Validation error: {e}")
+        print(f"\n❌ ERROR: {e}\n", file=sys.stderr)
+        return 1
+    
+    except Exception as e:
+        logger.exception("Unexpected error occurred")
+        print(f"\n❌ UNEXPECTED ERROR: {e}", file=sys.stderr)
+        print("Check house_duties.log for details.\n", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
