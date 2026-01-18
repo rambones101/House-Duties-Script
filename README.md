@@ -200,6 +200,40 @@ See [DISCORD_BOT_SETUP.md](DISCORD_BOT_SETUP.md) for detailed configuration.
 
 ## Common Workflows
 
+### Running Tests
+
+The project includes a comprehensive test suite with 54+ tests covering core functionality:
+
+```powershell
+# Install test dependencies
+pip install -r requirements.txt
+
+# Run all tests
+pytest
+
+# Run specific test file
+pytest tests/test_date_utils.py
+
+# Run with verbose output
+pytest -v
+
+# Run only unit tests (fast, no file I/O)
+pytest -m unit
+
+# Run only integration tests
+pytest -m integration
+
+# See test coverage (requires pytest-cov)
+pytest --cov=house_duties --cov-report=html
+```
+
+**Test Coverage:**
+- Date and time utilities (15 tests)
+- State management and persistence (8 tests)
+- Roster and constraints loading (14 tests)
+- Bonus task selection algorithm (10 tests)
+- CLI argument parsing (7 tests)
+
 ### Adding New Tasks
 
 1. Add to `build_templates()` in [house_duties.py](house_duties.py), grouped by deck
