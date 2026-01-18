@@ -27,6 +27,53 @@ A fraternity house chore scheduling system with persistent state tracking, fairn
 python house_duties.py
 ```
 
+### Command-Line Options
+
+The scheduler supports extensive CLI configuration:
+
+```powershell
+# Basic usage with defaults
+python house_duties.py
+
+# Generate 2 weeks starting from specific date
+python house_duties.py --weeks 2 --start-date 2026-01-19
+
+# Use custom input files
+python house_duties.py --roster my_brothers.txt --constraints my_rules.json
+
+# Preview schedule without saving (dry run)
+python house_duties.py --dry-run
+
+# Save outputs to specific directory
+python house_duties.py --output-dir ./schedules/
+
+# Verbose logging for debugging
+python house_duties.py -v
+
+# Quiet mode (errors only)
+python house_duties.py -q
+
+# See all available options
+python house_duties.py --help
+```
+
+**Available Arguments:**
+- `--roster FILE` - Path to brothers roster file (default: brothers.txt)
+- `--constraints FILE` - Path to constraints file (default: constraints.json)
+- `--categories FILE` - Path to categories file (default: brother_categories.json)
+- `--state FILE` - Path to state file (default: chore_state.json)
+- `--weeks N` - Number of weeks to generate (default: 1)
+- `--start-date YYYY-MM-DD` - Start date (default: auto-detect most recent Sunday)
+- `--output-dir DIR` - Directory for output files (default: current directory)
+- `--output-csv FILE` - Custom name for CSV output (default: schedule.csv)
+- `--output-json FILE` - Custom name for JSON output (default: schedule.json)
+- `--dry-run` - Preview without saving files
+- `--no-display` - Skip terminal display
+- `-v, --verbose` - Enable DEBUG logging
+- `-q, --quiet` - Only show errors
+- `--log-file FILE` - Custom log file path (default: house_duties.log)
+- `--version` - Show version number
+
 The script will:
 - Auto-detect the most recent Sunday
 - Generate assignments for the upcoming week
