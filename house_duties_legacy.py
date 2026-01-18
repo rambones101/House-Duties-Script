@@ -35,43 +35,25 @@ import sys
 import argparse
 from pathlib import Path
 
-try:
-    from house_duties.config import load_config, get_due_times, get_deck_order, get_bonus_priority, get_severity_overrides, get_config_value
-except ImportError:
-    # Fallback if package not available
-    load_config = None
-    get_due_times = None
-    get_deck_order = None
-    get_bonus_priority = None
-    get_severity_overrides = None
-    get_config_value = None
-
-__version__ = "1.2.0"
+__version__ = "1.1.0"
 
 # =========================
-# CONFIG — LOADED FROM config.yaml
+# CONFIG — EDIT THIS PART
 # =========================
-# These defaults are used only if config.yaml is not found
-# Edit config.yaml to customize scheduler behavior
 
-# Load configuration (will use defaults if config.yaml not found)
-_CONFIG = load_config() if load_config else {}
-
-def get_config():
-    """Get global configuration (lazy load)."""
-    global _CONFIG
-    if not _CONFIG and load_config:
-        _CONFIG = load_config()
-    return _CONFIG
-
-# Default values (fallback if config system not available)
 ROSTER_FILE = "brothers.txt"
-CONSTRAINTS_FILE = "constraints.json"
-CATEGORIES_FILE = "brother_categories.json"
+CONSTRAINTS_FILE = "constraints.json"  # optional
+CATEGORIES_FILE = "brother_categories.json"  # optional - for pairing rules
+
+# If "", auto-detect most recent Sunday from today (recommended)
 START_SUNDAY = ""
+
 WEEKS_TO_GENERATE = 1
+
+# Brasso cadence per deck: "weekly" or "biweekly"
 BRASSO_CADENCE_SECOND_DECK = "biweekly"
 BRASSO_CADENCE_THIRD_DECK = "biweekly"
+
 DEFAULT_DUE_TIMES = {
     "k&m": time(23, 59),
     "bathrooms": time(23, 59),
@@ -80,7 +62,12 @@ DEFAULT_DUE_TIMES = {
     "common": time(23, 59),
     "other": time(23, 59),
 }
-SEVERITY_OVERRIDES: Dict[str, int] = {}
+
+SEVERITY_OVERRIDES: Dict[str, int] = {
+    # "FD_KM_SUN": 5,
+}
+
+# --- "2–3x/week" policy ---
 BONUS_THIRD_CLEANING_MIN_ROSTER = 14
 BONUS_THIRD_CLEANING_MAX_TASK_SHARE = 0.50
 BONUS_PRIORITY = {
@@ -91,13 +78,19 @@ BONUS_PRIORITY = {
     "k&m": 0,
     "other": 0,
 }
-BASE_2X_DAYS_DEFAULT = [2, 4]
-BONUS_3RD_DAY_DEFAULT = 5
+BASE_2X_DAYS_DEFAULT = [2, 4]  # tues, Thu
+BONUS_3RD_DAY_DEFAULT = 5      # Fri
+
 STATE_FILE = "chore_state.json"
+
+# Fairness tuning
 REPEAT_TASK_PENALTY = 1.50
 SAME_DAY_STACK_PENALTY = 0.75
 RECENT_WEEK_PENALTY = 0.60
+
 RANDOM_SEED = 42
+
+# Deck ordering for display
 DECK_ORDER = ["Zero Deck", "First Deck", "Second Deck", "Third Deck", "Other"]
 
 # =========================
@@ -383,12 +376,9 @@ def is_banned(brother: str, occ: Occurrence, constraints: Dict[str, Any]) -> boo
     task_bans = constraints.get("brother_task_bans", {}).get(brother, []) or []
     return (occ.category in set(cat_bans)) or (occ.task_key in set(task_bans))
 
-def preference_bonus(brother: str, category: str, constraints: Dict[str, Any], config: Optional[Dict[str, Any]] = None) -> float:
-    if config is None:
-        config = get_config()
-    bonus_val = get_config_value(config, "fairness", "preference_bonus", default=-0.35)
+def preference_bonus(brother: str, category: str, constraints: Dict[str, Any]) -> float:
     prefs = constraints.get("brother_preferred_categories", {}).get(brother, []) or []
-    return bonus_val if category in set(prefs) else 0.0
+    return -0.35 if category in set(prefs) else 0.0
 
 
 # -------------------------
@@ -413,11 +403,8 @@ def default_severity_for(label: str, category: str) -> int:
 # Bonus selection (rotating)
 # -------------------------
 
-def week_capacity_allows_bonus(house_size: int, config: Optional[Dict[str, Any]] = None) -> bool:
-    if config is None:
-        config = get_config()
-    min_roster = get_config_value(config, "scheduling", "bonus_third_cleaning_min_roster", default=BONUS_THIRD_CLEANING_MIN_ROSTER)
-    return house_size >= min_roster
+def week_capacity_allows_bonus(house_size: int) -> bool:
+    return house_size >= BONUS_THIRD_CLEANING_MIN_ROSTER
 
 def stable_int_from_strings(*parts: str) -> int:
     h = hashlib.sha256("||".join(parts).encode("utf-8")).hexdigest()
@@ -428,17 +415,12 @@ def choose_bonus_tasks_for_week(templates: List[TaskTemplate],
                                 anchor_sunday: date,
                                 current_sunday: date,
                                 brothers: List[str],
-                                state: Dict[str, Any],
-                                config: Optional[Dict[str, Any]] = None) -> set[str]:
-    if config is None:
-        config = get_config()
-    
+                                state: Dict[str, Any]) -> set[str]:
     flex = [t for t in templates if t.flexible_2_3x]
-    if not flex or not week_capacity_allows_bonus(house_size, config):
+    if not flex or not week_capacity_allows_bonus(house_size):
         return set()
 
-    max_share = get_config_value(config, "scheduling", "bonus_third_cleaning_max_task_share", default=BONUS_THIRD_CLEANING_MAX_TASK_SHARE)
-    max_bonus = int(round(len(flex) * max_share))
+    max_bonus = int(round(len(flex) * BONUS_THIRD_CLEANING_MAX_TASK_SHARE))
     if max_bonus <= 0:
         return set()
 
@@ -448,15 +430,13 @@ def choose_bonus_tasks_for_week(templates: List[TaskTemplate],
 
     roster_sig = ",".join(sorted(brothers))
     widx = week_index_from_anchor(anchor_sunday, current_sunday)
-    random_seed = get_config_value(config, "scheduling", "random_seed", default=RANDOM_SEED)
-    seed_val = stable_int_from_strings(str(anchor_sunday), str(widx), roster_sig, str(random_seed))
+    seed_val = stable_int_from_strings(str(anchor_sunday), str(widx), roster_sig, str(RANDOM_SEED))
     rng = random.Random(seed_val)
 
-    bonus_priority = get_bonus_priority(config) if get_bonus_priority else BONUS_PRIORITY
     scored = []
     for t in flex:
         count = int(bonus_counts.get(t.key, 0))
-        catp = bonus_priority.get(t.category, 0)
+        catp = BONUS_PRIORITY.get(t.category, 0)
         scored.append((count, -catp, -t.severity, t.key))
     scored.sort()
 
@@ -474,23 +454,14 @@ def choose_bonus_tasks_for_week(templates: List[TaskTemplate],
 # Task templates (your chores)
 # -------------------------
 
-def build_templates(config: Optional[Dict[str, Any]] = None) -> List[TaskTemplate]:
-    if config is None:
-        config = get_config()
-    
-    severity_overrides = get_severity_overrides(config) if get_severity_overrides else SEVERITY_OVERRIDES
-    brasso_second = get_config_value(config, "cadence", "brasso_second_deck", default=BRASSO_CADENCE_SECOND_DECK)
-    brasso_third = get_config_value(config, "cadence", "brasso_third_deck", default=BRASSO_CADENCE_THIRD_DECK)
-    base_2x_days = get_config_value(config, "bonus", "base_2x_days", default=BASE_2X_DAYS_DEFAULT)
-    bonus_3rd_day = get_config_value(config, "bonus", "bonus_3rd_day", default=BONUS_3RD_DAY_DEFAULT)
-    
+def build_templates() -> List[TaskTemplate]:
     templates: List[TaskTemplate] = []
 
     def add(key, deck, label, category, people, cadence,
             days=None, times_per_week=None, preferred_days=None,
             severity=None, effort_multiplier=1.0, flexible_2_3x=False):
         sev = severity if severity is not None else default_severity_for(label, category)
-        sev = severity_overrides.get(key, severity_overrides.get(label, sev))
+        sev = SEVERITY_OVERRIDES.get(key, SEVERITY_OVERRIDES.get(label, sev))
         templates.append(TaskTemplate(
             key=key,
             deck=deck,
@@ -508,11 +479,11 @@ def build_templates(config: Optional[Dict[str, Any]] = None) -> List[TaskTemplat
 
     # -------- Zero Deck --------
     add("ZD_RATSKELLER_FLOOR", "Zero Deck", "Ratskeller Sweep+Mop", "floors", 2,
-        "n_per_week", times_per_week=2, preferred_days=base_2x_days,
+        "n_per_week", times_per_week=2, preferred_days=BASE_2X_DAYS_DEFAULT,
         effort_multiplier=1.1, flexible_2_3x=True)
 
     add("ZD_GAMEX_FLOOR", "Zero Deck", "Game Room + X-Room Sweep+Mop", "floors", 2,
-        "n_per_week", times_per_week=2, preferred_days=base_2x_days,
+        "n_per_week", times_per_week=2, preferred_days=BASE_2X_DAYS_DEFAULT,
         effort_multiplier=1.1, flexible_2_3x=True)
 
     add("ZD_LAUNDRY", "Zero Deck", "Laundry Room Clean", "laundry", 1,
@@ -526,35 +497,35 @@ def build_templates(config: Optional[Dict[str, Any]] = None) -> List[TaskTemplat
     add("FD_KM_THU", "First Deck", "k&m", "k&m", 2, "weekly", days=[4], effort_multiplier=1.1)
 
     add("FD_LIVING_FLOOR", "First Deck", "Living Room Sweep+Mop", "floors", 2,
-        "n_per_week", times_per_week=2, preferred_days=base_2x_days,
+        "n_per_week", times_per_week=2, preferred_days=BASE_2X_DAYS_DEFAULT,
         effort_multiplier=1.05, flexible_2_3x=True)
 
     add("FD_DINING_FLOOR", "First Deck", "Dining Room Sweep+Mop", "floors", 2,
-        "n_per_week", times_per_week=2, preferred_days=base_2x_days,
+        "n_per_week", times_per_week=2, preferred_days=BASE_2X_DAYS_DEFAULT,
         effort_multiplier=1.05, flexible_2_3x=True)
 
     # -------- Second Deck --------
     add("SD_HALL_FLOOR", "Second Deck", "Hallway Sweep+Mop", "floors", 2,
-        "n_per_week", times_per_week=2, preferred_days=base_2x_days, flexible_2_3x=True)
+        "n_per_week", times_per_week=2, preferred_days=BASE_2X_DAYS_DEFAULT, flexible_2_3x=True)
 
     add("SD_SINKS", "Second Deck", "Sinks Clean/Sweep Bathroom", "bathrooms", 1,
-        "n_per_week", times_per_week=2, preferred_days=base_2x_days, flexible_2_3x=True)
+        "n_per_week", times_per_week=2, preferred_days=BASE_2X_DAYS_DEFAULT, flexible_2_3x=True)
 
     add("SD_TOILETS", "Second Deck", "Toilets Clean/Mop Bathroom", "bathrooms", 1,
-        "n_per_week", times_per_week=2, preferred_days=base_2x_days, flexible_2_3x=True)
+        "n_per_week", times_per_week=2, preferred_days=BASE_2X_DAYS_DEFAULT, flexible_2_3x=True)
 
     add("SD_SHOWERS", "Second Deck", "Showers Clean", "bathrooms", 2,
         "weekly", days=[6], effort_multiplier=1.2)
 
     add("SD_STAIRS_FLOOR", "Second Deck", "Stairs Sweep+Mop", "floors", 2,
-        "n_per_week", times_per_week=2, preferred_days=base_2x_days,
+        "n_per_week", times_per_week=2, preferred_days=BASE_2X_DAYS_DEFAULT,
         effort_multiplier=1.1, flexible_2_3x=True)
 
     add("SD_LROOM", "Second Deck", "L-Room Clean", "common", 1, "weekly", days=[6])
     add("SD_LIBRARY", "Second Deck", "Library Clean", "common", 1, "weekly", days=[6])
     # add("SD_WINDOW_FRAMES", "Second Deck", "Window Frames Clean", "common", 1, "weekly", days=[6])
 
-    if brasso_second == "biweekly":
+    if BRASSO_CADENCE_SECOND_DECK == "biweekly":
         add("SD_BRASSO", "Second Deck", "Brasso", "other", 1, "biweekly", days=[6], severity=3)
     else:
         add("SD_BRASSO", "Second Deck", "Brasso", "other", 1, "weekly", days=[6], severity=3)
@@ -563,22 +534,22 @@ def build_templates(config: Optional[Dict[str, Any]] = None) -> List[TaskTemplat
 
     # -------- Third Deck --------
     add("TD_HALL_FLOOR", "Third Deck", "Hallway Sweep+Mop", "floors", 2,
-        "n_per_week", times_per_week=2, preferred_days=base_2x_days, flexible_2_3x=True)
+        "n_per_week", times_per_week=2, preferred_days=BASE_2X_DAYS_DEFAULT, flexible_2_3x=True)
 
     add("TD_SINKS", "Third Deck", "Sinks Clean/Sweep Bathroom", "bathrooms", 1,
-        "n_per_week", times_per_week=2, preferred_days=base_2x_days, flexible_2_3x=True)
+        "n_per_week", times_per_week=2, preferred_days=BASE_2X_DAYS_DEFAULT, flexible_2_3x=True)
 
     add("TD_TOILETS", "Third Deck", "Toilets Clean/Mop Bathroom", "bathrooms", 1,
-        "n_per_week", times_per_week=2, preferred_days=base_2x_days, flexible_2_3x=True)
+        "n_per_week", times_per_week=2, preferred_days=BASE_2X_DAYS_DEFAULT, flexible_2_3x=True)
 
     add("TD_SHOWERS", "Third Deck", "Showers Clean", "bathrooms", 2,
         "weekly", days=[6], effort_multiplier=1.2)
 
     add("TD_STAIRS_FLOOR", "Third Deck", "Stairs Sweep+Mop", "floors", 2,
-        "n_per_week", times_per_week=2, preferred_days=base_2x_days,
+        "n_per_week", times_per_week=2, preferred_days=BASE_2X_DAYS_DEFAULT,
         effort_multiplier=1.1, flexible_2_3x=True)
 
-    if brasso_third == "biweekly":
+    if BRASSO_CADENCE_THIRD_DECK == "biweekly":
         add("TD_BRASSO", "Third Deck", "Brasso", "other", 1, "biweekly", days=[6], severity=3)
     else:
         add("TD_BRASSO", "Third Deck", "Brasso", "other", 1, "weekly", days=[6], severity=3)
@@ -597,15 +568,7 @@ def occurrences_from_templates(templates: List[TaskTemplate],
                                current_sunday: date,
                                weeks: int,
                                brothers: List[str],
-                               state: Dict[str, Any],
-                               config: Optional[Dict[str, Any]] = None) -> List[Occurrence]:
-    if config is None:
-        config = get_config()
-    
-    due_times = get_due_times(config) if get_due_times else DEFAULT_DUE_TIMES
-    base_2x_days = get_config_value(config, "bonus", "base_2x_days", default=BASE_2X_DAYS_DEFAULT)
-    bonus_3rd_day = get_config_value(config, "bonus", "bonus_3rd_day", default=BONUS_3RD_DAY_DEFAULT)
-    
+                               state: Dict[str, Any]) -> List[Occurrence]:
     house_size = len(brothers)
     occs: List[Occurrence] = []
 
@@ -619,15 +582,14 @@ def occurrences_from_templates(templates: List[TaskTemplate],
             anchor_sunday=anchor_sunday,
             current_sunday=ws,
             brothers=brothers,
-            state=state,
-            config=config
+            state=state
         )
 
         for tpl in templates:
             if tpl.cadence == "biweekly" and (widx % 2 == 1):
                 continue
 
-            due_t = due_times.get(tpl.category, due_times.get("other", time(23, 59)))
+            due_t = DEFAULT_DUE_TIMES.get(tpl.category, DEFAULT_DUE_TIMES["other"])
 
             if tpl.cadence in ("weekly", "biweekly"):
                 days = tpl.days_of_week or [6]
@@ -638,11 +600,11 @@ def occurrences_from_templates(templates: List[TaskTemplate],
 
             elif tpl.cadence == "n_per_week":
                 times = tpl.times_per_week or 1
-                preferred = tpl.preferred_days or base_2x_days
+                preferred = tpl.preferred_days or BASE_2X_DAYS_DEFAULT
                 chosen_days = preferred[:times]
 
                 if tpl.flexible_2_3x and tpl.key in bonus_keys:
-                    chosen_days = chosen_days + [bonus_3rd_day]
+                    chosen_days = chosen_days + [BONUS_3RD_DAY_DEFAULT]
 
                 for d in unique_sorted_days(chosen_days):
                     due_dt = dt_on(ws, d, due_t)
@@ -807,20 +769,16 @@ def assign_chores(occs: List[Occurrence],
 # Output (grouped by deck)
 # -------------------------
 
-def deck_sort_key(deck: str, config: Optional[Dict[str, Any]] = None) -> int:
-    if config is None:
-        config = get_config()
-    deck_order = get_deck_order(config) if get_deck_order else DECK_ORDER
+def deck_sort_key(deck: str) -> int:
     try:
-        return deck_order.index(deck)
+        return DECK_ORDER.index(deck)
     except ValueError:
-        return len(deck_order)
+        return len(DECK_ORDER)
 
 def print_schedule_by_deck(schedule_items: List[Dict[str, Any]],
                            current_sunday: date,
                            anchor_sunday: date,
-                           house_size: int,
-                           config: Optional[Dict[str, Any]] = None):
+                           house_size: int):
     week_end = current_sunday + timedelta(days=6)
     widx = week_index_from_anchor(anchor_sunday, current_sunday)
 
@@ -848,7 +806,7 @@ def print_schedule_by_deck(schedule_items: List[Dict[str, Any]],
         
         # Iterate through decks in proper order for this date
         date_decks = by_date[date_str]
-        for deck in sorted(date_decks.keys(), key=lambda d: deck_sort_key(d, config)):
+        for deck in sorted(date_decks.keys(), key=deck_sort_key):
             print(f"\n\n  {deck}:")
             
             # Sort items by due time, then task name
@@ -909,19 +867,8 @@ def write_json(schedule_items: List[Dict[str, Any]], filepath: str):
 # Command-Line Interface
 # -------------------------
 
-def parse_arguments(config: Optional[Dict[str, Any]] = None) -> argparse.Namespace:
+def parse_arguments() -> argparse.Namespace:
     """Parse command-line arguments."""
-    if config is None:
-        config = get_config()
-    
-    # Get defaults from config
-    roster_default = get_config_value(config, "files", "roster", default=ROSTER_FILE)
-    constraints_default = get_config_value(config, "files", "constraints", default=CONSTRAINTS_FILE)
-    categories_default = get_config_value(config, "files", "categories", default=CATEGORIES_FILE)
-    state_default = get_config_value(config, "files", "state", default=STATE_FILE)
-    weeks_default = get_config_value(config, "scheduling", "weeks_to_generate", default=WEEKS_TO_GENERATE)
-    start_default = get_config_value(config, "scheduling", "start_sunday", default=START_SUNDAY)
-    
     parser = argparse.ArgumentParser(
         description="House Duties Scheduler - Automated chore assignment system",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -953,42 +900,35 @@ Examples:
     # Input files
     parser.add_argument(
         '--roster',
-        default=roster_default,
-        help=f'Path to brothers roster file (default: {roster_default})'
+        default=ROSTER_FILE,
+        help=f'Path to brothers roster file (default: {ROSTER_FILE})'
     )
     parser.add_argument(
         '--constraints',
-        default=constraints_default,
-        help=f'Path to constraints file (default: {constraints_default})'
+        default=CONSTRAINTS_FILE,
+        help=f'Path to constraints file (default: {CONSTRAINTS_FILE})'
     )
     parser.add_argument(
         '--categories',
-        default=categories_default,
-        help=f'Path to categories file (default: {categories_default})'
+        default=CATEGORIES_FILE,
+        help=f'Path to categories file (default: {CATEGORIES_FILE})'
     )
     parser.add_argument(
         '--state',
-        default=state_default,
-        help=f'Path to state file (default: {state_default})'
-    )
-    
-    # Config file option
-    parser.add_argument(
-        '--config',
-        default='config.yaml',
-        help='Path to config file (default: config.yaml)'
+        default=STATE_FILE,
+        help=f'Path to state file (default: {STATE_FILE})'
     )
     
     # Schedule generation
     parser.add_argument(
         '--weeks',
         type=int,
-        default=weeks_default,
-        help=f'Number of weeks to generate (default: {weeks_default})'
+        default=WEEKS_TO_GENERATE,
+        help=f'Number of weeks to generate (default: {WEEKS_TO_GENERATE})'
     )
     parser.add_argument(
         '--start-date',
-        default=start_default,
+        default=START_SUNDAY,
         help='Start date (YYYY-MM-DD). If empty, uses most recent Sunday (default: auto-detect)'
     )
     
@@ -1084,15 +1024,10 @@ def configure_logging(args: argparse.Namespace) -> None:
 # Main
 # -------------------------
 
-def main(args: Optional[argparse.Namespace] = None, config: Optional[Dict[str, Any]] = None) -> int:
+def main(args: Optional[argparse.Namespace] = None) -> int:
     """Main execution function with comprehensive error handling."""
     if args is None:
         args = parse_arguments()
-    
-    # Load configuration (can be overridden by args)
-    if config is None:
-        config_path = getattr(args, 'config', 'config.yaml')
-        config = load_config(config_path) if load_config else get_config()
     
     # Configure logging based on arguments
     configure_logging(args)
@@ -1129,7 +1064,7 @@ def main(args: Optional[argparse.Namespace] = None, config: Optional[Dict[str, A
         logger.info(f"Using anchor Sunday: {anchor_sunday}")
 
         # Build task templates
-        templates = build_templates(config)
+        templates = build_templates()
         logger.info(f"Built {len(templates)} task templates")
 
         # Generate occurrences
@@ -1139,8 +1074,7 @@ def main(args: Optional[argparse.Namespace] = None, config: Optional[Dict[str, A
             current_sunday=current_sunday,
             weeks=args.weeks,
             brothers=brothers,
-            state=state,
-            config=config
+            state=state
         )
         logger.info(f"Generated {len(occs)} task occurrences for {args.weeks} week(s)")
 
@@ -1165,7 +1099,7 @@ def main(args: Optional[argparse.Namespace] = None, config: Optional[Dict[str, A
 
         # Display schedule
         if not args.no_display:
-            print_schedule_by_deck(schedule_items, current_sunday, anchor_sunday, house_size, config)
+            print_schedule_by_deck(schedule_items, current_sunday, anchor_sunday, house_size)
 
         # Write output files
         if not args.dry_run:
@@ -1215,9 +1149,8 @@ def main(args: Optional[argparse.Namespace] = None, config: Optional[Dict[str, A
 
 if __name__ == "__main__":
     try:
-        config = get_config()
-        args = parse_arguments(config)
-        sys.exit(main(args, config))
+        args = parse_arguments()
+        sys.exit(main(args))
     except KeyboardInterrupt:
         print("\n\nInterrupted by user", file=sys.stderr)
         sys.exit(130)
