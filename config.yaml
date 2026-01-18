@@ -1,0 +1,107 @@
+# House Duties Scheduler Configuration
+# Edit this file to customize scheduler behavior
+
+# ========================================
+# FILE PATHS
+# ========================================
+files:
+  roster: "brothers.txt"
+  constraints: "constraints.json"      # optional - brother opt-outs and bans
+  categories: "brother_categories.json" # optional - brother preferences
+  state: "chore_state.json"
+
+# ========================================
+# SCHEDULING PARAMETERS
+# ========================================
+scheduling:
+  # If empty, auto-detects most recent Sunday
+  start_sunday: ""
+  
+  # Number of weeks to generate schedules for
+  weeks_to_generate: 1
+  
+  # Minimum roster size to enable bonus 3rd cleanings
+  bonus_third_cleaning_min_roster: 14
+  
+  # Maximum task share for bonus selection (0.0-1.0)
+  bonus_third_cleaning_max_task_share: 0.50
+  
+  # Random seed for deterministic tie-breaking
+  random_seed: 42
+
+# ========================================
+# TASK CADENCE (per deck)
+# ========================================
+# Options: "weekly" or "biweekly"
+cadence:
+  brasso_second_deck: "biweekly"
+  brasso_third_deck: "biweekly"
+
+# ========================================
+# DEFAULT DUE TIMES (by category)
+# ========================================
+# Format: "HH:MM" in 24-hour time
+due_times:
+  k&m: "23:59"
+  bathrooms: "23:59"
+  floors: "23:59"
+  laundry: "23:59"
+  common: "23:59"
+  other: "23:59"
+
+# ========================================
+# BONUS 3RD CLEANING POLICY
+# ========================================
+# Days for base 2x cleanings (0=Sun, 6=Sat)
+bonus:
+  base_2x_days: [2, 4]  # Tuesday, Thursday
+  bonus_3rd_day: 5      # Friday
+  
+  # Priority by category (higher = selected first for bonus)
+  priority:
+    bathrooms: 3
+    floors: 2
+    common: 1
+    laundry: 0
+    k&m: 0
+    other: 0
+
+# ========================================
+# FAIRNESS ALGORITHM TUNING
+# ========================================
+# These penalties affect brother selection scoring
+# Lower scores = assigned first
+fairness:
+  # Penalty for assigning same task to brother again
+  repeat_task_penalty: 1.50
+  
+  # Penalty for assigning task done last week
+  recent_week_penalty: 0.60
+  
+  # Penalty for stacking multiple tasks on same day
+  same_day_stack_penalty: 0.75
+  
+  # Bonus (negative penalty) for preferred categories
+  preference_bonus: -0.35
+
+# ========================================
+# DISPLAY SETTINGS
+# ========================================
+display:
+  # Deck ordering for output (preserves this order)
+  deck_order:
+    - "Zero Deck"
+    - "First Deck"
+    - "Second Deck"
+    - "Third Deck"
+    - "Other"
+
+# ========================================
+# SEVERITY OVERRIDES
+# ========================================
+# Override default severity (1-5) for specific tasks
+# Format: task_key: severity_value
+severity_overrides: {}
+  # Example:
+  # FD_KM_SUN: 5
+  # TD_FLOORS_MON: 4
