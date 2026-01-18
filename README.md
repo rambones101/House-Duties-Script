@@ -10,6 +10,7 @@ A fraternity house chore scheduling system with persistent state tracking, fairn
 - **Biweekly Parity System**: Maintains odd/even week rotation tracking from anchor Sunday
 - **Bonus Task Selection**: Dynamically assigns 2-3 cleanings/week based on roster size
 - **Constraint Support**: Handles opt-outs, category bans, and task-specific restrictions
+- **Data Validation**: Comprehensive input validation for brothers, tasks, and constraints
 - **Discord Bot Integration**: Optional bot for posting schedules and sending reminders
 
 ## Quick Start
@@ -69,6 +70,7 @@ python house_duties.py --help
 - `--output-json FILE` - Custom name for JSON output (default: schedule.json)
 - `--dry-run` - Preview without saving files
 - `--no-display` - Skip terminal display
+- `--ignore-validation-errors` - Continue even if validation fails (not recommended)
 - `-v, --verbose` - Enable DEBUG logging
 - `-q, --quiet` - Only show errors
 - `--log-file FILE` - Custom log file path (default: house_duties.log)
@@ -198,11 +200,52 @@ Post schedules automatically to Discord with reminders.
 
 See [DISCORD_BOT_SETUP.md](DISCORD_BOT_SETUP.md) for detailed configuration.
 
+## Data Validation
+
+The scheduler automatically validates all inputs before generating the schedule:
+
+### Brother Validation
+- **Duplicates**: Case-insensitive duplicate detection
+- **Empty names**: Catches empty strings and whitespace-only names
+- **Type checking**: Ensures all entries are valid strings
+- **Warnings**: Alerts for very short names or special characters
+
+### Task Template Validation
+- **Required fields**: Validates all mandatory attributes (key, label, deck, category, etc.)
+- **Valid categories**: Ensures category is one of: k&m, bathrooms, floors, laundry, common, other
+- **Cadence rules**: Validates cadence-specific requirements
+  - `n_per_week` must have `times_per_week` (1-7)
+  - Day values must be 0-6 (Sunday-Saturday)
+- **Duplicate keys**: Prevents conflicting task identifiers
+- **Severity and effort**: Validates numeric ranges (severity: 1-5, effort_multiplier > 0)
+
+### Constraint Validation
+- **Brother references**: Ensures all names in constraints exist in roster
+- **Category names**: Validates category names in bans/preferences
+- **Numeric constraints**: Checks max_per_brother_per_week/day are positive
+- **Logical checks**: Prevents exempting entire roster
+
+### Handling Validation Errors
+
+By default, validation errors stop execution:
+```powershell
+python house_duties.py
+# ERROR: Duplicate brother names found: john
+```
+
+To continue despite validation errors (not recommended):
+```powershell
+python house_duties.py --ignore-validation-errors
+# WARNING: Continuing with invalid data
+```
+
+**Best Practice**: Fix validation errors rather than ignoring them to ensure fair and correct scheduling.
+
 ## Common Workflows
 
 ### Running Tests
 
-The project includes a comprehensive test suite with 54+ tests covering core functionality:
+The project includes a comprehensive test suite with 96 tests covering core functionality:
 
 ```powershell
 # Install test dependencies
@@ -233,6 +276,7 @@ pytest --cov=house_duties --cov-report=html
 - Roster and constraints loading (14 tests)
 - Bonus task selection algorithm (10 tests)
 - CLI argument parsing (7 tests)
+- Data validation (42 tests)
 
 ### Adding New Tasks
 

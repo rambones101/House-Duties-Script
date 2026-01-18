@@ -35,7 +35,17 @@ import sys
 import argparse
 from pathlib import Path
 
-__version__ = "1.1.0"
+# Import validation module
+try:
+    from house_duties.validation import validate_all, validate_brothers, ValidationError
+except ImportError:
+    logger = logging.getLogger(__name__)
+    logger.warning("Validation module not available - skipping validation")
+    validate_all = None
+    validate_brothers = None
+    ValidationError = ValueError
+
+__version__ = "1.2.0"
 
 # =========================
 # CONFIG — EDIT THIS PART
@@ -956,6 +966,11 @@ Examples:
         action='store_true',
         help='Skip terminal display of schedule'
     )
+    parser.add_argument(
+        '--ignore-validation-errors',
+        action='store_true',
+        help='Continue execution even if validation fails (not recommended)'
+    )
     
     # Logging
     parser.add_argument(
@@ -1054,6 +1069,37 @@ def main(args: Optional[argparse.Namespace] = None) -> int:
         constraints = load_constraints(args.constraints)
         categories = load_categories(args.categories)
 
+        # Validate inputs
+        logger.info("Validating inputs...")
+        try:
+            if validate_all is not None:
+                # Build templates first for validation
+                templates = build_templates()
+                
+                # Validate all inputs together
+                validate_all(
+                    brothers=brothers,
+                    templates=templates,
+                    constraints=constraints,
+                    categories=categories if categories else None
+                )
+                logger.info("✓ All inputs validated successfully")
+            else:
+                logger.warning("Skipping validation - module not available")
+                templates = build_templates()
+        except ValidationError as e:
+            logger.error(f"Validation failed: {e}")
+            if not args.ignore_validation_errors:
+                raise
+            logger.warning("Continuing with invalid data (--ignore-validation-errors enabled)")
+            templates = build_templates()
+        except Exception as e:
+            logger.error(f"Unexpected error during validation: {e}")
+            if not args.ignore_validation_errors:
+                raise
+            logger.warning("Continuing despite validation error")
+            templates = build_templates()
+
         # Calculate dates
         current_sunday = parse_start_sunday(args.start_date)
         logger.info(f"Generating schedule for {args.weeks} week(s) starting: {current_sunday}")
@@ -1063,8 +1109,6 @@ def main(args: Optional[argparse.Namespace] = None) -> int:
         anchor_sunday = get_anchor_sunday(state, current_sunday)
         logger.info(f"Using anchor Sunday: {anchor_sunday}")
 
-        # Build task templates
-        templates = build_templates()
         logger.info(f"Built {len(templates)} task templates")
 
         # Generate occurrences
@@ -1116,6 +1160,23 @@ def main(args: Optional[argparse.Namespace] = None) -> int:
             logger.info("="*60)
             logger.info("SUCCESS: Schedule generation completed")
             logger.info(f"Saved: {csv_path}, {json_path}, and {args.state}")
+            
+            # Generate dashboard if requested
+            if args.dashboard:
+                try:
+                    from house_duties.dashboard import generate_dashboard_html
+                    dashboard_path = output_dir / args.dashboard_output
+                    generate_dashboard_html(
+                        schedule_json_path=str(json_path),
+                        output_html_path=str(dashboard_path),
+                        title="House Duties Schedule"
+                    )
+                    logger.info(f"Generated dashboard: {dashboard_path}")
+                except ImportError:
+                    logger.warning("Dashboard module not available")
+                except Exception as e:
+                    logger.error(f"Failed to generate dashboard: {e}")
+            
             logger.info("="*60)
         else:
             logger.info("="*60)
