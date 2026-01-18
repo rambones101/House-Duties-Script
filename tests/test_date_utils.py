@@ -7,7 +7,7 @@ import os
 # Add parent directory to path to import house_duties
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from house_duties import (
+from house_duties_legacy import (
     most_recent_sunday,
     parse_start_sunday,
     week_start_for,
@@ -45,7 +45,7 @@ class TestDateHelpers:
         """Test parse_start_sunday with empty string uses today."""
         result = parse_start_sunday("")
         # Should return most recent Sunday from today
-        assert result <= date.today()
+        assert result <= __import__('datetime').date.today()
         assert result.weekday() == 6  # Sunday
     
     @pytest.mark.unit

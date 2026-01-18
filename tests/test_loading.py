@@ -5,7 +5,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from house_duties import (
+from house_duties_legacy import (
     load_brothers,
     load_constraints,
     load_categories,
@@ -95,7 +95,7 @@ class TestConstraintsLoading:
     @pytest.mark.unit
     def test_is_banned_category(self, sample_constraints):
         """Test is_banned with category ban."""
-        from house_duties import Occurrence
+        from house_duties_legacy import Occurrence
         from datetime import datetime
         
         occ = Occurrence(
@@ -115,7 +115,7 @@ class TestConstraintsLoading:
     @pytest.mark.unit
     def test_is_banned_task(self, sample_constraints):
         """Test is_banned with task ban."""
-        from house_duties import Occurrence
+        from house_duties_legacy import Occurrence
         from datetime import datetime
         
         occ = Occurrence(

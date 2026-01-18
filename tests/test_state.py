@@ -6,7 +6,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from house_duties import (
+from house_duties_legacy import (
     load_state,
     save_state,
     get_anchor_sunday

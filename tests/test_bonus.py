@@ -5,7 +5,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from house_duties import (
+from house_duties_legacy import (
     week_capacity_allows_bonus,
     stable_int_from_strings,
     choose_bonus_tasks_for_week,
@@ -32,7 +32,7 @@ class TestBonusSelection:
     @pytest.mark.unit
     def test_week_capacity_allows_bonus_exact_threshold(self):
         """Test bonus at exact threshold."""
-        from house_duties import BONUS_THIRD_CLEANING_MIN_ROSTER
+        from house_duties_legacy import BONUS_THIRD_CLEANING_MIN_ROSTER
         result = week_capacity_allows_bonus(BONUS_THIRD_CLEANING_MIN_ROSTER)
         assert result is True
     

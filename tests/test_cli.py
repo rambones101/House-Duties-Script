@@ -6,7 +6,7 @@ from argparse import Namespace
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from house_duties import parse_arguments
+from house_duties_legacy import parse_arguments
 
 
 class TestCLIParsing:
