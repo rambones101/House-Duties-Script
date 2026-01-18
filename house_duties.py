@@ -32,7 +32,10 @@ import os
 import hashlib
 import logging
 import sys
+import argparse
 from pathlib import Path
+
+__version__ = "1.1.0"
 
 # =========================
 # CONFIG — EDIT THIS PART
@@ -861,27 +864,202 @@ def write_json(schedule_items: List[Dict[str, Any]], filepath: str):
 
 
 # -------------------------
+# Command-Line Interface
+# -------------------------
+
+def parse_arguments() -> argparse.Namespace:
+    """Parse command-line arguments."""
+    parser = argparse.ArgumentParser(
+        description="House Duties Scheduler - Automated chore assignment system",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Basic usage (uses defaults)
+  python house_duties.py
+  
+  # Generate 2 weeks starting from specific date
+  python house_duties.py --weeks 2 --start-date 2026-01-19
+  
+  # Use custom files
+  python house_duties.py --roster my_brothers.txt --constraints my_rules.json
+  
+  # Preview without saving (dry run)
+  python house_duties.py --dry-run
+  
+  # Specify output directory
+  python house_duties.py --output-dir ./schedules/
+  
+  # Verbose logging
+  python house_duties.py -v
+  
+  # Quiet mode (errors only)
+  python house_duties.py -q
+"""
+    )
+    
+    # Input files
+    parser.add_argument(
+        '--roster',
+        default=ROSTER_FILE,
+        help=f'Path to brothers roster file (default: {ROSTER_FILE})'
+    )
+    parser.add_argument(
+        '--constraints',
+        default=CONSTRAINTS_FILE,
+        help=f'Path to constraints file (default: {CONSTRAINTS_FILE})'
+    )
+    parser.add_argument(
+        '--categories',
+        default=CATEGORIES_FILE,
+        help=f'Path to categories file (default: {CATEGORIES_FILE})'
+    )
+    parser.add_argument(
+        '--state',
+        default=STATE_FILE,
+        help=f'Path to state file (default: {STATE_FILE})'
+    )
+    
+    # Schedule generation
+    parser.add_argument(
+        '--weeks',
+        type=int,
+        default=WEEKS_TO_GENERATE,
+        help=f'Number of weeks to generate (default: {WEEKS_TO_GENERATE})'
+    )
+    parser.add_argument(
+        '--start-date',
+        default=START_SUNDAY,
+        help='Start date (YYYY-MM-DD). If empty, uses most recent Sunday (default: auto-detect)'
+    )
+    
+    # Output options
+    parser.add_argument(
+        '--output-dir',
+        default='.',
+        help='Directory for output files (default: current directory)'
+    )
+    parser.add_argument(
+        '--output-csv',
+        help='Custom name for CSV output (default: schedule.csv)'
+    )
+    parser.add_argument(
+        '--output-json',
+        help='Custom name for JSON output (default: schedule.json)'
+    )
+    parser.add_argument(
+        '--dry-run',
+        action='store_true',
+        help='Preview schedule without saving any files'
+    )
+    parser.add_argument(
+        '--no-display',
+        action='store_true',
+        help='Skip terminal display of schedule'
+    )
+    
+    # Logging
+    parser.add_argument(
+        '-v', '--verbose',
+        action='store_true',
+        help='Enable verbose logging (DEBUG level)'
+    )
+    parser.add_argument(
+        '-q', '--quiet',
+        action='store_true',
+        help='Quiet mode - only show errors'
+    )
+    parser.add_argument(
+        '--log-file',
+        default='house_duties.log',
+        help='Path to log file (default: house_duties.log)'
+    )
+    
+    # Version
+    parser.add_argument(
+        '--version',
+        action='version',
+        version=f'%(prog)s {__version__}'
+    )
+    
+    args = parser.parse_args()
+    
+    # Validation
+    if args.weeks < 1:
+        parser.error('--weeks must be at least 1')
+    
+    if args.start_date:
+        try:
+            date.fromisoformat(args.start_date)
+        except ValueError:
+            parser.error(f'Invalid date format: {args.start_date}. Use YYYY-MM-DD')
+    
+    return args
+
+
+def configure_logging(args: argparse.Namespace) -> None:
+    """Configure logging based on command-line arguments."""
+    # Determine log level
+    if args.verbose:
+        level = logging.DEBUG
+    elif args.quiet:
+        level = logging.ERROR
+    else:
+        level = logging.INFO
+    
+    # Configure handlers
+    handlers = [logging.StreamHandler(sys.stdout)]
+    
+    if not args.dry_run:
+        handlers.append(logging.FileHandler(args.log_file, mode='a'))
+    
+    logging.basicConfig(
+        level=level,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=handlers,
+        force=True  # Reconfigure if already configured
+    )
+
+
+# -------------------------
 # Main
 # -------------------------
 
-def main():
+def main(args: Optional[argparse.Namespace] = None) -> int:
     """Main execution function with comprehensive error handling."""
+    if args is None:
+        args = parse_arguments()
+    
+    # Configure logging based on arguments
+    configure_logging(args)
+    
+    # Get logger after configuration
+    logger = logging.getLogger(__name__)
+    
     try:
+        if args.dry_run:
+            logger.info("DRY RUN MODE - No files will be saved")
+        
         logger.info("="*60)
-        logger.info("Starting House Duties Scheduler")
+        logger.info(f"House Duties Scheduler v{__version__}")
         logger.info("="*60)
         
+        # Create output directory if needed
+        output_dir = Path(args.output_dir)
+        if not args.dry_run and not output_dir.exists():
+            output_dir.mkdir(parents=True, exist_ok=True)
+            logger.info(f"Created output directory: {output_dir}")
+        
         # Load input files
-        brothers = load_brothers(ROSTER_FILE)
-        constraints = load_constraints(CONSTRAINTS_FILE)
-        categories = load_categories(CATEGORIES_FILE)
+        brothers = load_brothers(args.roster)
+        constraints = load_constraints(args.constraints)
+        categories = load_categories(args.categories)
 
         # Calculate dates
-        current_sunday = parse_start_sunday(START_SUNDAY)
-        logger.info(f"Generating schedule for week starting: {current_sunday}")
+        current_sunday = parse_start_sunday(args.start_date)
+        logger.info(f"Generating schedule for {args.weeks} week(s) starting: {current_sunday}")
 
         # Load and initialize state
-        state = load_state(STATE_FILE)
+        state = load_state(args.state)
         anchor_sunday = get_anchor_sunday(state, current_sunday)
         logger.info(f"Using anchor Sunday: {anchor_sunday}")
 
@@ -894,11 +1072,11 @@ def main():
             templates=templates,
             anchor_sunday=anchor_sunday,
             current_sunday=current_sunday,
-            weeks=WEEKS_TO_GENERATE,
+            weeks=args.weeks,
             brothers=brothers,
             state=state
         )
-        logger.info(f"Generated {len(occs)} task occurrences for {WEEKS_TO_GENERATE} week(s)")
+        logger.info(f"Generated {len(occs)} task occurrences for {args.weeks} week(s)")
 
         # Assign chores
         result = assign_chores(
@@ -920,17 +1098,29 @@ def main():
         logger.info(f"Active house size: {house_size} brothers")
 
         # Display schedule
-        print_schedule_by_deck(schedule_items, current_sunday, anchor_sunday, house_size)
+        if not args.no_display:
+            print_schedule_by_deck(schedule_items, current_sunday, anchor_sunday, house_size)
 
         # Write output files
-        write_csv(schedule_items, "schedule.csv")
-        write_json(schedule_items, "schedule.json")
-        save_state(STATE_FILE, state)
+        if not args.dry_run:
+            csv_file = args.output_csv or "schedule.csv"
+            json_file = args.output_json or "schedule.json"
+            
+            csv_path = output_dir / csv_file
+            json_path = output_dir / json_file
+            
+            write_csv(schedule_items, str(csv_path))
+            write_json(schedule_items, str(json_path))
+            save_state(args.state, state)
 
-        logger.info("="*60)
-        logger.info("SUCCESS: Schedule generation completed")
-        logger.info("Saved: schedule.csv, schedule.json, and chore_state.json")
-        logger.info("="*60)
+            logger.info("="*60)
+            logger.info("SUCCESS: Schedule generation completed")
+            logger.info(f"Saved: {csv_path}, {json_path}, and {args.state}")
+            logger.info("="*60)
+        else:
+            logger.info("="*60)
+            logger.info("DRY RUN COMPLETE: No files were modified")
+            logger.info("="*60)
         
         # Use ASCII-safe output for Windows terminals
         try:
@@ -958,4 +1148,9 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        args = parse_arguments()
+        sys.exit(main(args))
+    except KeyboardInterrupt:
+        print("\n\nInterrupted by user", file=sys.stderr)
+        sys.exit(130)

@@ -7,9 +7,9 @@
     "due": "2026-01-18 23:59",
     "people_needed": 3,
     "assigned": [
-      "Tim",
-      "Akira",
-      "Henry"
+      "Alex",
+      "Maddox",
+      "Yuto"
     ],
     "weight_total": 18.0
   },
@@ -22,7 +22,7 @@
     "people_needed": 2,
     "assigned": [
       "Alex",
-      "Jean Paul"
+      "Jeff"
     ],
     "weight_total": 11.0
   },
@@ -34,8 +34,8 @@
     "due": "2026-01-20 23:59",
     "people_needed": 2,
     "assigned": [
-      "Yuto",
-      "Maddox"
+      "Sal",
+      "Kabir"
     ],
     "weight_total": 11.0
   },
@@ -47,8 +47,8 @@
     "due": "2026-01-20 23:59",
     "people_needed": 2,
     "assigned": [
-      "Sal",
-      "Gabe"
+      "Akira",
+      "Jeff"
     ],
     "weight_total": 6.6
   },
@@ -60,8 +60,8 @@
     "due": "2026-01-20 23:59",
     "people_needed": 2,
     "assigned": [
-      "Akira",
-      "Jean Paul"
+      "Yuto",
+      "Maddox"
     ],
     "weight_total": 6.6
   },
@@ -73,7 +73,7 @@
     "due": "2026-01-20 23:59",
     "people_needed": 2,
     "assigned": [
-      "Jeff",
+      "Yuto",
       "Jean Paul"
     ],
     "weight_total": 6.6
@@ -86,8 +86,8 @@
     "due": "2026-01-20 23:59",
     "people_needed": 2,
     "assigned": [
-      "Erick",
-      "Yuto"
+      "Kabir",
+      "Daniel"
     ],
     "weight_total": 6.6
   },
@@ -99,8 +99,8 @@
     "due": "2026-01-20 23:59",
     "people_needed": 2,
     "assigned": [
-      "Kabir",
-      "Sal"
+      "Jeff",
+      "Akira"
     ],
     "weight_total": 6.3
   },
@@ -112,8 +112,8 @@
     "due": "2026-01-20 23:59",
     "people_needed": 2,
     "assigned": [
-      "Akira",
-      "Henry"
+      "Yuto",
+      "Sal"
     ],
     "weight_total": 6.3
   },
@@ -125,8 +125,8 @@
     "due": "2026-01-20 23:59",
     "people_needed": 2,
     "assigned": [
-      "Kabir",
-      "Erick"
+      "Yuto",
+      "Carlos"
     ],
     "weight_total": 6.0
   },
@@ -138,8 +138,8 @@
     "due": "2026-01-20 23:59",
     "people_needed": 2,
     "assigned": [
-      "Gabe",
-      "Jean Paul"
+      "Alex",
+      "Kabir"
     ],
     "weight_total": 6.0
   },
@@ -151,7 +151,7 @@
     "due": "2026-01-20 23:59",
     "people_needed": 1,
     "assigned": [
-      "Kabir"
+      "Tim"
     ],
     "weight_total": 4.0
   },
@@ -163,7 +163,7 @@
     "due": "2026-01-20 23:59",
     "people_needed": 1,
     "assigned": [
-      "Tim"
+      "Akira"
     ],
     "weight_total": 4.0
   },
@@ -175,7 +175,7 @@
     "due": "2026-01-20 23:59",
     "people_needed": 1,
     "assigned": [
-      "Tim"
+      "Daniel"
     ],
     "weight_total": 4.0
   },
@@ -187,7 +187,7 @@
     "due": "2026-01-20 23:59",
     "people_needed": 1,
     "assigned": [
-      "Jeff"
+      "Tim"
     ],
     "weight_total": 4.0
   },
@@ -199,7 +199,7 @@
     "due": "2026-01-21 23:59",
     "people_needed": 2,
     "assigned": [
-      "Yuto",
+      "Kabir",
       "Erick"
     ],
     "weight_total": 11.0
@@ -212,8 +212,8 @@
     "due": "2026-01-22 23:59",
     "people_needed": 2,
     "assigned": [
-      "Kabir",
-      "Alex"
+      "Erick",
+      "Akira"
     ],
     "weight_total": 11.0
   },
@@ -225,8 +225,8 @@
     "due": "2026-01-22 23:59",
     "people_needed": 2,
     "assigned": [
-      "Akira",
-      "Carlos"
+      "Gabe",
+      "Jean Paul"
     ],
     "weight_total": 6.6
   },
@@ -238,8 +238,8 @@
     "due": "2026-01-22 23:59",
     "people_needed": 2,
     "assigned": [
-      "Alex",
-      "Sal"
+      "Akira",
+      "Maddox"
     ],
     "weight_total": 6.6
   },
@@ -251,8 +251,8 @@
     "due": "2026-01-22 23:59",
     "people_needed": 2,
     "assigned": [
-      "Tim",
-      "Yuto"
+      "Alex",
+      "Jean Paul"
     ],
     "weight_total": 6.6
   },
@@ -264,8 +264,8 @@
     "due": "2026-01-22 23:59",
     "people_needed": 2,
     "assigned": [
-      "Erick",
-      "Jeff"
+      "Akira",
+      "Gabe"
     ],
     "weight_total": 6.6
   },
@@ -277,8 +277,8 @@
     "due": "2026-01-22 23:59",
     "people_needed": 2,
     "assigned": [
-      "Sal",
-      "Erick"
+      "Yuto",
+      "Tim"
     ],
     "weight_total": 6.3
   },
@@ -290,8 +290,8 @@
     "due": "2026-01-22 23:59",
     "people_needed": 2,
     "assigned": [
-      "Kabir",
-      "Akira"
+      "Gabe",
+      "Maddox"
     ],
     "weight_total": 6.3
   },
@@ -303,8 +303,8 @@
     "due": "2026-01-22 23:59",
     "people_needed": 2,
     "assigned": [
-      "Erick",
-      "Akira"
+      "Akira",
+      "Daniel"
     ],
     "weight_total": 6.0
   },
@@ -316,8 +316,8 @@
     "due": "2026-01-22 23:59",
     "people_needed": 2,
     "assigned": [
-      "Akira",
-      "Erick"
+      "Jeff",
+      "Henry"
     ],
     "weight_total": 6.0
   },
@@ -329,7 +329,7 @@
     "due": "2026-01-22 23:59",
     "people_needed": 1,
     "assigned": [
-      "Akira"
+      "Yuto"
     ],
     "weight_total": 4.0
   },
@@ -341,7 +341,7 @@
     "due": "2026-01-22 23:59",
     "people_needed": 1,
     "assigned": [
-      "Jean Paul"
+      "Gabe"
     ],
     "weight_total": 4.0
   },
@@ -353,7 +353,7 @@
     "due": "2026-01-22 23:59",
     "people_needed": 1,
     "assigned": [
-      "Henry"
+      "Alex"
     ],
     "weight_total": 4.0
   },
@@ -365,33 +365,20 @@
     "due": "2026-01-22 23:59",
     "people_needed": 1,
     "assigned": [
-      "Tim"
+      "Jeff"
     ],
     "weight_total": 4.0
   },
   {
-    "task_key": "SD_STAIRS_FLOOR",
+    "task_key": "TD_STAIRS_FLOOR",
     "task": "Stairs Sweep+Mop",
-    "deck": "Second Deck",
-    "category": "floors",
-    "due": "2026-01-23 23:59",
-    "people_needed": 2,
-    "assigned": [
-      "Gabe",
-      "Jeff"
-    ],
-    "weight_total": 6.6
-  },
-  {
-    "task_key": "ZD_GAMEX_FLOOR",
-    "task": "Game Room + X-Room Sweep+Mop",
-    "deck": "Zero Deck",
+    "deck": "Third Deck",
     "category": "floors",
     "due": "2026-01-23 23:59",
     "people_needed": 2,
     "assigned": [
       "Alex",
-      "Erick"
+      "Yuto"
     ],
     "weight_total": 6.6
   },
@@ -404,45 +391,57 @@
     "people_needed": 2,
     "assigned": [
       "Alex",
-      "Tim"
+      "Henry"
     ],
     "weight_total": 6.6
   },
   {
-    "task_key": "FD_DINING_FLOOR",
-    "task": "Dining Room Sweep+Mop",
+    "task_key": "FD_LIVING_FLOOR",
+    "task": "Living Room Sweep+Mop",
     "deck": "First Deck",
     "category": "floors",
     "due": "2026-01-23 23:59",
     "people_needed": 2,
     "assigned": [
-      "Tim",
-      "Akira"
+      "Alex",
+      "Erick"
     ],
     "weight_total": 6.3
   },
   {
-    "task_key": "SD_HALL_FLOOR",
+    "task_key": "TD_HALL_FLOOR",
     "task": "Hallway Sweep+Mop",
-    "deck": "Second Deck",
+    "deck": "Third Deck",
     "category": "floors",
     "due": "2026-01-23 23:59",
     "people_needed": 2,
     "assigned": [
-      "Jeff",
-      "Akira"
+      "Gabe",
+      "Erick"
     ],
     "weight_total": 6.0
   },
   {
-    "task_key": "TD_TOILETS",
+    "task_key": "SD_TOILETS",
     "task": "Toilets Clean/Mop Bathroom",
+    "deck": "Second Deck",
+    "category": "bathrooms",
+    "due": "2026-01-23 23:59",
+    "people_needed": 1,
+    "assigned": [
+      "Henry"
+    ],
+    "weight_total": 4.0
+  },
+  {
+    "task_key": "TD_SINKS",
+    "task": "Sinks Clean/Sweep Bathroom",
     "deck": "Third Deck",
     "category": "bathrooms",
     "due": "2026-01-23 23:59",
     "people_needed": 1,
     "assigned": [
-      "Jeff"
+      "Tim"
     ],
     "weight_total": 4.0
   },
@@ -454,8 +453,8 @@
     "due": "2026-01-24 23:59",
     "people_needed": 2,
     "assigned": [
-      "Akira",
-      "Kabir"
+      "Erick",
+      "Alex"
     ],
     "weight_total": 9.6
   },
@@ -468,7 +467,7 @@
     "people_needed": 2,
     "assigned": [
       "Akira",
-      "Tim"
+      "Kabir"
     ],
     "weight_total": 9.6
   },
@@ -492,7 +491,7 @@
     "due": "2026-01-24 23:59",
     "people_needed": 1,
     "assigned": [
-      "Sal"
+      "Daniel"
     ],
     "weight_total": 3.0
   },
@@ -504,7 +503,7 @@
     "due": "2026-01-24 23:59",
     "people_needed": 1,
     "assigned": [
-      "Sal"
+      "Yuto"
     ],
     "weight_total": 3.0
   },
@@ -516,7 +515,7 @@
     "due": "2026-01-24 23:59",
     "people_needed": 1,
     "assigned": [
-      "Erick"
+      "Akira"
     ],
     "weight_total": 3.0
   },
@@ -528,7 +527,7 @@
     "due": "2026-01-24 23:59",
     "people_needed": 1,
     "assigned": [
-      "Kabir"
+      "Jean Paul"
     ],
     "weight_total": 3.0
   },
@@ -540,7 +539,7 @@
     "due": "2026-01-24 23:59",
     "people_needed": 1,
     "assigned": [
-      "Gabe"
+      "Jean Paul"
     ],
     "weight_total": 3.0
   },
@@ -552,7 +551,515 @@
     "due": "2026-01-24 23:59",
     "people_needed": 1,
     "assigned": [
+      "Yuto"
+    ],
+    "weight_total": 2.0
+  },
+  {
+    "task_key": "FD_KM_SUN",
+    "task": "k&m",
+    "deck": "First Deck",
+    "category": "k&m",
+    "due": "2026-01-25 23:59",
+    "people_needed": 3,
+    "assigned": [
+      "Gabe",
+      "Carlos",
+      "Jeff"
+    ],
+    "weight_total": 18.0
+  },
+  {
+    "task_key": "FD_KM_MON",
+    "task": "k&m",
+    "deck": "First Deck",
+    "category": "k&m",
+    "due": "2026-01-26 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Kabir",
+      "Yuto"
+    ],
+    "weight_total": 11.0
+  },
+  {
+    "task_key": "FD_KM_TUE",
+    "task": "k&m",
+    "deck": "First Deck",
+    "category": "k&m",
+    "due": "2026-01-27 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Yuto",
+      "Sal"
+    ],
+    "weight_total": 11.0
+  },
+  {
+    "task_key": "SD_STAIRS_FLOOR",
+    "task": "Stairs Sweep+Mop",
+    "deck": "Second Deck",
+    "category": "floors",
+    "due": "2026-01-27 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Gabe",
+      "Daniel"
+    ],
+    "weight_total": 6.6
+  },
+  {
+    "task_key": "TD_STAIRS_FLOOR",
+    "task": "Stairs Sweep+Mop",
+    "deck": "Third Deck",
+    "category": "floors",
+    "due": "2026-01-27 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Sal",
+      "Erick"
+    ],
+    "weight_total": 6.6
+  },
+  {
+    "task_key": "ZD_GAMEX_FLOOR",
+    "task": "Game Room + X-Room Sweep+Mop",
+    "deck": "Zero Deck",
+    "category": "floors",
+    "due": "2026-01-27 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Jeff",
       "Kabir"
+    ],
+    "weight_total": 6.6
+  },
+  {
+    "task_key": "ZD_RATSKELLER_FLOOR",
+    "task": "Ratskeller Sweep+Mop",
+    "deck": "Zero Deck",
+    "category": "floors",
+    "due": "2026-01-27 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Sal",
+      "Henry"
+    ],
+    "weight_total": 6.6
+  },
+  {
+    "task_key": "FD_DINING_FLOOR",
+    "task": "Dining Room Sweep+Mop",
+    "deck": "First Deck",
+    "category": "floors",
+    "due": "2026-01-27 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Akira",
+      "Maddox"
+    ],
+    "weight_total": 6.3
+  },
+  {
+    "task_key": "FD_LIVING_FLOOR",
+    "task": "Living Room Sweep+Mop",
+    "deck": "First Deck",
+    "category": "floors",
+    "due": "2026-01-27 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Jeff",
+      "Carlos"
+    ],
+    "weight_total": 6.3
+  },
+  {
+    "task_key": "SD_HALL_FLOOR",
+    "task": "Hallway Sweep+Mop",
+    "deck": "Second Deck",
+    "category": "floors",
+    "due": "2026-01-27 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Sal",
+      "Erick"
+    ],
+    "weight_total": 6.0
+  },
+  {
+    "task_key": "TD_HALL_FLOOR",
+    "task": "Hallway Sweep+Mop",
+    "deck": "Third Deck",
+    "category": "floors",
+    "due": "2026-01-27 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Sal",
+      "Tim"
+    ],
+    "weight_total": 6.0
+  },
+  {
+    "task_key": "SD_SINKS",
+    "task": "Sinks Clean/Sweep Bathroom",
+    "deck": "Second Deck",
+    "category": "bathrooms",
+    "due": "2026-01-27 23:59",
+    "people_needed": 1,
+    "assigned": [
+      "Jean Paul"
+    ],
+    "weight_total": 4.0
+  },
+  {
+    "task_key": "SD_TOILETS",
+    "task": "Toilets Clean/Mop Bathroom",
+    "deck": "Second Deck",
+    "category": "bathrooms",
+    "due": "2026-01-27 23:59",
+    "people_needed": 1,
+    "assigned": [
+      "Jeff"
+    ],
+    "weight_total": 4.0
+  },
+  {
+    "task_key": "TD_SINKS",
+    "task": "Sinks Clean/Sweep Bathroom",
+    "deck": "Third Deck",
+    "category": "bathrooms",
+    "due": "2026-01-27 23:59",
+    "people_needed": 1,
+    "assigned": [
+      "Yuto"
+    ],
+    "weight_total": 4.0
+  },
+  {
+    "task_key": "TD_TOILETS",
+    "task": "Toilets Clean/Mop Bathroom",
+    "deck": "Third Deck",
+    "category": "bathrooms",
+    "due": "2026-01-27 23:59",
+    "people_needed": 1,
+    "assigned": [
+      "Alex"
+    ],
+    "weight_total": 4.0
+  },
+  {
+    "task_key": "FD_KM_WED",
+    "task": "k&m",
+    "deck": "First Deck",
+    "category": "k&m",
+    "due": "2026-01-28 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Gabe",
+      "Jean Paul"
+    ],
+    "weight_total": 11.0
+  },
+  {
+    "task_key": "FD_KM_THU",
+    "task": "k&m",
+    "deck": "First Deck",
+    "category": "k&m",
+    "due": "2026-01-29 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Jeff",
+      "Kabir"
+    ],
+    "weight_total": 11.0
+  },
+  {
+    "task_key": "SD_STAIRS_FLOOR",
+    "task": "Stairs Sweep+Mop",
+    "deck": "Second Deck",
+    "category": "floors",
+    "due": "2026-01-29 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Alex",
+      "Henry"
+    ],
+    "weight_total": 6.6
+  },
+  {
+    "task_key": "TD_STAIRS_FLOOR",
+    "task": "Stairs Sweep+Mop",
+    "deck": "Third Deck",
+    "category": "floors",
+    "due": "2026-01-29 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Gabe",
+      "Carlos"
+    ],
+    "weight_total": 6.6
+  },
+  {
+    "task_key": "ZD_GAMEX_FLOOR",
+    "task": "Game Room + X-Room Sweep+Mop",
+    "deck": "Zero Deck",
+    "category": "floors",
+    "due": "2026-01-29 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Akira",
+      "Daniel"
+    ],
+    "weight_total": 6.6
+  },
+  {
+    "task_key": "ZD_RATSKELLER_FLOOR",
+    "task": "Ratskeller Sweep+Mop",
+    "deck": "Zero Deck",
+    "category": "floors",
+    "due": "2026-01-29 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Alex",
+      "Erick"
+    ],
+    "weight_total": 6.6
+  },
+  {
+    "task_key": "FD_DINING_FLOOR",
+    "task": "Dining Room Sweep+Mop",
+    "deck": "First Deck",
+    "category": "floors",
+    "due": "2026-01-29 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Alex",
+      "Carlos"
+    ],
+    "weight_total": 6.3
+  },
+  {
+    "task_key": "FD_LIVING_FLOOR",
+    "task": "Living Room Sweep+Mop",
+    "deck": "First Deck",
+    "category": "floors",
+    "due": "2026-01-29 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Jeff",
+      "Henry"
+    ],
+    "weight_total": 6.3
+  },
+  {
+    "task_key": "SD_HALL_FLOOR",
+    "task": "Hallway Sweep+Mop",
+    "deck": "Second Deck",
+    "category": "floors",
+    "due": "2026-01-29 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Yuto",
+      "Gabe"
+    ],
+    "weight_total": 6.0
+  },
+  {
+    "task_key": "TD_HALL_FLOOR",
+    "task": "Hallway Sweep+Mop",
+    "deck": "Third Deck",
+    "category": "floors",
+    "due": "2026-01-29 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Jeff",
+      "Sal"
+    ],
+    "weight_total": 6.0
+  },
+  {
+    "task_key": "SD_SINKS",
+    "task": "Sinks Clean/Sweep Bathroom",
+    "deck": "Second Deck",
+    "category": "bathrooms",
+    "due": "2026-01-29 23:59",
+    "people_needed": 1,
+    "assigned": [
+      "Tim"
+    ],
+    "weight_total": 4.0
+  },
+  {
+    "task_key": "SD_TOILETS",
+    "task": "Toilets Clean/Mop Bathroom",
+    "deck": "Second Deck",
+    "category": "bathrooms",
+    "due": "2026-01-29 23:59",
+    "people_needed": 1,
+    "assigned": [
+      "Sal"
+    ],
+    "weight_total": 4.0
+  },
+  {
+    "task_key": "TD_SINKS",
+    "task": "Sinks Clean/Sweep Bathroom",
+    "deck": "Third Deck",
+    "category": "bathrooms",
+    "due": "2026-01-29 23:59",
+    "people_needed": 1,
+    "assigned": [
+      "Henry"
+    ],
+    "weight_total": 4.0
+  },
+  {
+    "task_key": "TD_TOILETS",
+    "task": "Toilets Clean/Mop Bathroom",
+    "deck": "Third Deck",
+    "category": "bathrooms",
+    "due": "2026-01-29 23:59",
+    "people_needed": 1,
+    "assigned": [
+      "Jeff"
+    ],
+    "weight_total": 4.0
+  },
+  {
+    "task_key": "TD_STAIRS_FLOOR",
+    "task": "Stairs Sweep+Mop",
+    "deck": "Third Deck",
+    "category": "floors",
+    "due": "2026-01-30 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Akira",
+      "Carlos"
+    ],
+    "weight_total": 6.6
+  },
+  {
+    "task_key": "ZD_GAMEX_FLOOR",
+    "task": "Game Room + X-Room Sweep+Mop",
+    "deck": "Zero Deck",
+    "category": "floors",
+    "due": "2026-01-30 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Erick",
+      "Akira"
+    ],
+    "weight_total": 6.6
+  },
+  {
+    "task_key": "FD_LIVING_FLOOR",
+    "task": "Living Room Sweep+Mop",
+    "deck": "First Deck",
+    "category": "floors",
+    "due": "2026-01-30 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Yuto",
+      "Jeff"
+    ],
+    "weight_total": 6.3
+  },
+  {
+    "task_key": "TD_HALL_FLOOR",
+    "task": "Hallway Sweep+Mop",
+    "deck": "Third Deck",
+    "category": "floors",
+    "due": "2026-01-30 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Sal",
+      "Gabe"
+    ],
+    "weight_total": 6.0
+  },
+  {
+    "task_key": "SD_TOILETS",
+    "task": "Toilets Clean/Mop Bathroom",
+    "deck": "Second Deck",
+    "category": "bathrooms",
+    "due": "2026-01-30 23:59",
+    "people_needed": 1,
+    "assigned": [
+      "Henry"
+    ],
+    "weight_total": 4.0
+  },
+  {
+    "task_key": "TD_SINKS",
+    "task": "Sinks Clean/Sweep Bathroom",
+    "deck": "Third Deck",
+    "category": "bathrooms",
+    "due": "2026-01-30 23:59",
+    "people_needed": 1,
+    "assigned": [
+      "Kabir"
+    ],
+    "weight_total": 4.0
+  },
+  {
+    "task_key": "SD_SHOWERS",
+    "task": "Showers Clean",
+    "deck": "Second Deck",
+    "category": "bathrooms",
+    "due": "2026-01-31 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Erick",
+      "Tim"
+    ],
+    "weight_total": 9.6
+  },
+  {
+    "task_key": "TD_SHOWERS",
+    "task": "Showers Clean",
+    "deck": "Third Deck",
+    "category": "bathrooms",
+    "due": "2026-01-31 23:59",
+    "people_needed": 2,
+    "assigned": [
+      "Tim",
+      "Erick"
+    ],
+    "weight_total": 9.6
+  },
+  {
+    "task_key": "SD_LROOM",
+    "task": "L-Room Clean",
+    "deck": "Second Deck",
+    "category": "common",
+    "due": "2026-01-31 23:59",
+    "people_needed": 1,
+    "assigned": [
+      "Jean Paul"
+    ],
+    "weight_total": 3.0
+  },
+  {
+    "task_key": "SD_LIBRARY",
+    "task": "Library Clean",
+    "deck": "Second Deck",
+    "category": "common",
+    "due": "2026-01-31 23:59",
+    "people_needed": 1,
+    "assigned": [
+      "Sal"
+    ],
+    "weight_total": 3.0
+  },
+  {
+    "task_key": "ZD_LAUNDRY",
+    "task": "Laundry Room Clean",
+    "deck": "Zero Deck",
+    "category": "laundry",
+    "due": "2026-01-31 23:59",
+    "people_needed": 1,
+    "assigned": [
+      "Jean Paul"
     ],
     "weight_total": 2.0
   }
