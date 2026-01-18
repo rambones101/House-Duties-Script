@@ -1,0 +1,29 @@
+# Discord bot secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Generated files (optional - uncomment if you don't want to track these)
+# schedule.csv
+# schedule.json
+# chore_state.json

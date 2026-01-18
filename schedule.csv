@@ -1,0 +1,45 @@
+due,deck,task_key,task,category,people_needed,assigned,weight_total
+2026-01-18 23:59,First Deck,FD_KM_SUN,k&m,k&m,3,"Tim, Jeff, Carlos",18.0
+2026-01-19 23:59,First Deck,FD_KM_MON,k&m,k&m,2,"Jeff, Maddox",11.0
+2026-01-20 23:59,First Deck,FD_KM_TUE,k&m,k&m,2,"Akira, Sal",11.0
+2026-01-20 23:59,First Deck,FD_DINING_FLOOR,Dining Room Sweep+Mop,floors,2,"Alex, Akira",6.3
+2026-01-20 23:59,First Deck,FD_LIVING_FLOOR,Living Room Sweep+Mop,floors,2,"Alex, Jean Paul",6.3
+2026-01-21 23:59,First Deck,FD_KM_WED,k&m,k&m,2,"Sal, Yuto",11.0
+2026-01-22 23:59,First Deck,FD_KM_THU,k&m,k&m,2,"Tim, Henry",11.0
+2026-01-22 23:59,First Deck,FD_DINING_FLOOR,Dining Room Sweep+Mop,floors,2,"Gabe, Jeff",6.3
+2026-01-22 23:59,First Deck,FD_LIVING_FLOOR,Living Room Sweep+Mop,floors,2,"Sal, Tim",6.3
+2026-01-23 23:59,First Deck,FD_LIVING_FLOOR,Living Room Sweep+Mop,floors,2,"Tim, Kabir",6.3
+2026-01-20 23:59,Second Deck,SD_STAIRS_FLOOR,Stairs Sweep+Mop,floors,2,"Tim, Akira",6.6
+2026-01-20 23:59,Second Deck,SD_HALL_FLOOR,Hallway Sweep+Mop,floors,2,"Yuto, Sal",6.0
+2026-01-20 23:59,Second Deck,SD_SINKS,Sinks Clean/Sweep Bathroom,bathrooms,1,Henry,4.0
+2026-01-20 23:59,Second Deck,SD_TOILETS,Toilets Clean/Mop Bathroom,bathrooms,1,Akira,4.0
+2026-01-22 23:59,Second Deck,SD_STAIRS_FLOOR,Stairs Sweep+Mop,floors,2,"Erick, Gabe",6.6
+2026-01-22 23:59,Second Deck,SD_HALL_FLOOR,Hallway Sweep+Mop,floors,2,"Akira, Kabir",6.0
+2026-01-22 23:59,Second Deck,SD_SINKS,Sinks Clean/Sweep Bathroom,bathrooms,1,Sal,4.0
+2026-01-22 23:59,Second Deck,SD_TOILETS,Toilets Clean/Mop Bathroom,bathrooms,1,Sal,4.0
+2026-01-23 23:59,Second Deck,SD_TOILETS,Toilets Clean/Mop Bathroom,bathrooms,1,Henry,4.0
+2026-01-24 23:59,Second Deck,SD_SHOWERS,Showers Clean,bathrooms,2,"Akira, Gabe",9.6
+2026-01-24 23:59,Second Deck,SD_BLUE,Blue,other,1,Gabe,3.0
+2026-01-24 23:59,Second Deck,SD_BRASSO,Brasso,other,1,Kabir,3.0
+2026-01-24 23:59,Second Deck,SD_LROOM,L-Room Clean,common,1,Maddox,3.0
+2026-01-24 23:59,Second Deck,SD_LIBRARY,Library Clean,common,1,Alex,3.0
+2026-01-20 23:59,Third Deck,TD_STAIRS_FLOOR,Stairs Sweep+Mop,floors,2,"Alex, Henry",6.6
+2026-01-20 23:59,Third Deck,TD_HALL_FLOOR,Hallway Sweep+Mop,floors,2,"Erick, Daniel",6.0
+2026-01-20 23:59,Third Deck,TD_SINKS,Sinks Clean/Sweep Bathroom,bathrooms,1,Kabir,4.0
+2026-01-20 23:59,Third Deck,TD_TOILETS,Toilets Clean/Mop Bathroom,bathrooms,1,Gabe,4.0
+2026-01-22 23:59,Third Deck,TD_STAIRS_FLOOR,Stairs Sweep+Mop,floors,2,"Kabir, Jean Paul",6.6
+2026-01-22 23:59,Third Deck,TD_HALL_FLOOR,Hallway Sweep+Mop,floors,2,"Tim, Alex",6.0
+2026-01-22 23:59,Third Deck,TD_SINKS,Sinks Clean/Sweep Bathroom,bathrooms,1,Maddox,4.0
+2026-01-22 23:59,Third Deck,TD_TOILETS,Toilets Clean/Mop Bathroom,bathrooms,1,Carlos,4.0
+2026-01-23 23:59,Third Deck,TD_STAIRS_FLOOR,Stairs Sweep+Mop,floors,2,"Yuto, Henry",6.6
+2026-01-23 23:59,Third Deck,TD_HALL_FLOOR,Hallway Sweep+Mop,floors,2,"Jeff, Maddox",6.0
+2026-01-23 23:59,Third Deck,TD_SINKS,Sinks Clean/Sweep Bathroom,bathrooms,1,Kabir,4.0
+2026-01-24 23:59,Third Deck,TD_SHOWERS,Showers Clean,bathrooms,2,"Tim, Alex",9.6
+2026-01-24 23:59,Third Deck,TD_BLUE,Blue,other,1,Henry,3.0
+2026-01-24 23:59,Third Deck,TD_BRASSO,Brasso,other,1,Gabe,3.0
+2026-01-20 23:59,Zero Deck,ZD_GAMEX_FLOOR,Game Room + X-Room Sweep+Mop,floors,2,"Kabir, Daniel",6.6
+2026-01-20 23:59,Zero Deck,ZD_RATSKELLER_FLOOR,Ratskeller Sweep+Mop,floors,2,"Kabir, Gabe",6.6
+2026-01-22 23:59,Zero Deck,ZD_GAMEX_FLOOR,Game Room + X-Room Sweep+Mop,floors,2,"Gabe, Jeff",6.6
+2026-01-22 23:59,Zero Deck,ZD_RATSKELLER_FLOOR,Ratskeller Sweep+Mop,floors,2,"Alex, Tim",6.6
+2026-01-23 23:59,Zero Deck,ZD_RATSKELLER_FLOOR,Ratskeller Sweep+Mop,floors,2,"Gabe, Sal",6.6
+2026-01-24 23:59,Zero Deck,ZD_LAUNDRY,Laundry Room Clean,laundry,1,Kabir,2.0
