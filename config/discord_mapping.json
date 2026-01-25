@@ -1,0 +1,15 @@
+{
+  "comment": "Maps Discord usernames/display names to brother names in brothers.txt",
+  "instructions": "Add entries below in the format 'Discord Name': 'Brother Name'. The Discord name should match exactly how it appears in Discord (case-insensitive matching is supported).",
+  "mappings": {
+    "Fagtive": "Gabe",
+    "Erick(Mr.RAmirez)": "Erick",
+    "JEAN PAUL": "Jean Paul",
+    "안녕하세요": "Tim",
+    "信州満月": "Yuto",
+    "Jeff Nicolas Olarte": "Jeff",
+    "Carlos Bernal": "Carlos",
+    "Mr. Retired": "Akira",
+    "Supreme leader general Kabir": "Kabir"
+  }
+}

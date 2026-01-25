@@ -18,7 +18,7 @@ from .output import write_csv, write_json, print_schedule_by_deck
 # Configuration Constants
 START_SUNDAY = ""  # Leave empty for auto-detect
 WEEKS_TO_GENERATE = 1
-BONUS_THIRD_CLEANING_MIN_ROSTER = 14
+BONUS_THIRD_CLEANING_MIN_ROSTER = 20  # Minimum roster size to enable bonus 3rd cleanings
 RANDOM_SEED = 42
 
 
@@ -107,7 +107,7 @@ File Paths:
     parser.add_argument(
         '--constraints',
         type=str,
-        default='constraints.json',
+        default='config/constraints.json',
         help='Path to constraints file (optional)'
     )
     parser.add_argument(
@@ -229,7 +229,7 @@ def main(args: Optional[argparse.Namespace] = None) -> int:
             print("\n" + "="*80)
             print(f"HOUSE DUTIES SCHEDULE - Week of {start_sunday}")
             print("="*80 + "\n")
-            print_schedule_by_deck(schedule, start_sunday)
+            print_schedule_by_deck(schedule, start_sunday, anchor_sunday, len(brothers))
         
         logger.info("Schedule generation completed successfully")
         return 0

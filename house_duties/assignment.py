@@ -1,13 +1,48 @@
 """Assignment logic for distributing chores to brothers with fairness algorithms."""
 from typing import List, Dict, Tuple, Any, Set
 from collections import defaultdict
+from datetime import date
 import random
+import json
+import os
+import logging
 from .models import Occurrence
 from .utils import DOW
+
+logger = logging.getLogger(__name__)
 
 
 def normalize_set(x) -> Set[str]:
     return set(s.strip() for s in x) if isinstance(x, (list, set)) else set()
+
+
+def load_brother_categories() -> Dict[str, List[str]]:
+    """Load brother categories (actives vs junior actives) from config file."""
+    config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", "brother_categories.json")
+    try:
+        with open(config_path, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {"actives": [], "junior_actives": []}
+
+
+def requires_junior_active_pairing(occ: Occurrence) -> bool:
+    """Check if this occurrence requires junior active to be paired with an active."""
+    return occ.people_needed == 2
+
+
+def validate_junior_active_pairing(assigned: List[str], brother_categories: Dict[str, List[str]]) -> bool:
+    """Validate that if a junior active is assigned, an active is also assigned (for 2-person tasks)."""
+    actives = set(brother_categories.get("actives", []))
+    junior_actives = set(brother_categories.get("junior_actives", []))
+    
+    has_junior_active = any(bro in junior_actives for bro in assigned)
+    has_active = any(bro in actives for bro in assigned)
+    
+    # If a junior active is assigned, require at least one active
+    if has_junior_active and not has_active:
+        return False
+    return True
 
 
 def is_banned(brother: str, occ: Occurrence, constraints: Dict[str, Any]) -> bool:
@@ -15,6 +50,36 @@ def is_banned(brother: str, occ: Occurrence, constraints: Dict[str, Any]) -> boo
     cat_bans = constraints.get("brother_category_bans", {}).get(brother, [])
     task_bans = constraints.get("brother_task_bans", {}).get(brother, [])
     return occ.category in cat_bans or occ.task_key in task_bans
+
+
+def is_unavailable(brother: str, occ: Occurrence, constraints: Dict[str, Any]) -> bool:
+    """Check if a brother is unavailable on the task's due date."""
+    unavailable_dates = constraints.get("brother_unavailable_dates", {}).get(brother, [])
+    if not unavailable_dates:
+        return False
+    
+    task_date = occ.due_dt.date()
+    
+    for date_spec in unavailable_dates:
+        if isinstance(date_spec, str):
+            # Single date: "2026-01-20"
+            try:
+                unavail_date = date.fromisoformat(date_spec)
+                if task_date == unavail_date:
+                    return True
+            except (ValueError, AttributeError):
+                logger.warning(f"Invalid date format for {brother}: {date_spec}")
+        elif isinstance(date_spec, dict):
+            # Date range: {"start": "2026-01-20", "end": "2026-01-27"}
+            try:
+                start_date = date.fromisoformat(date_spec.get("start", ""))
+                end_date = date.fromisoformat(date_spec.get("end", ""))
+                if start_date <= task_date <= end_date:
+                    return True
+            except (ValueError, AttributeError, TypeError):
+                logger.warning(f"Invalid date range for {brother}: {date_spec}")
+    
+    return False
 
 
 def preference_bonus(brother: str, category: str, constraints: Dict[str, Any]) -> float:
@@ -43,8 +108,14 @@ def assign_chores(
     - Day penalty: Same-day task count × 0.75
     - Preference: -0.35 bonus for preferred categories
     - Jitter: Small random value for tie-breaking
+    - Junior Active Pairing: On 2-person tasks, junior actives must be paired with actives
     """
     random.seed(random_seed)
+    
+    # Load brother categories for pairing logic
+    brother_categories = load_brother_categories()
+    actives = set(brother_categories.get("actives", []))
+    junior_actives = set(brother_categories.get("junior_actives", []))
 
     # Constants
     REPEAT_TASK_PENALTY = 1.50
@@ -55,8 +126,8 @@ def assign_chores(
     # Extract constraints
     exempt_all = normalize_set(constraints.get("exempt_all", []))
     on_call_only = normalize_set(constraints.get("on_call_only", []))
-    max_per_day = constraints.get("max_per_brother_per_day", 2)
-    max_per_week = constraints.get("max_per_brother_per_week", 5)
+    max_per_day = constraints.get("max_per_brother_per_day") or 2
+    max_per_week = constraints.get("max_per_brother_per_week") or 5
 
     # Build active pool
     normal_pool = [b for b in brothers if b not in exempt_all and b not in on_call_only]
@@ -90,6 +161,9 @@ def assign_chores(
             for bro in pool:
                 # Hard constraints
                 if is_banned(bro, occ, constraints):
+                    continue
+                
+                if is_unavailable(bro, occ, constraints):
                     continue
 
                 week_count = len(this_week_tasks[bro])
@@ -127,6 +201,18 @@ def assign_chores(
             # Pick lowest score
             candidates.sort()
             _, chosen = candidates[0]
+            
+            # For 2-person tasks, enforce junior active pairing constraint
+            # If we already have a junior active and need to pick the 2nd person,
+            # ensure we pick an active (not another junior active)
+            if occ.people_needed == 2 and len(assigned) == 1:
+                first_assignee = assigned[0]
+                if first_assignee in junior_actives and chosen in junior_actives:
+                    # Both would be junior actives, find an active instead
+                    active_candidates = [c for c in candidates if c[1] in actives]
+                    if active_candidates:
+                        _, chosen = active_candidates[0]
+            
             assigned.append(chosen)
 
             # Update tracking

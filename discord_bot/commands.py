@@ -3,6 +3,8 @@ import discord
 from discord.ext import commands
 from datetime import datetime, date as dt_date
 from typing import Optional
+import json
+import os
 
 from .scheduler import load_schedule, run_scheduler_with_retry
 from .embeds import (
@@ -15,6 +17,42 @@ from .embeds import (
     create_status_embed
 )
 from .config import COLOR_SUCCESS, COLOR_WARNING
+
+
+def load_discord_mapping():
+    """Load Discord username to brother name mapping."""
+    mapping_path = "config/discord_mapping.json"
+    if os.path.exists(mapping_path):
+        try:
+            with open(mapping_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data.get('mappings', {})
+        except:
+            pass
+    return {}
+
+
+def get_brother_name(member: discord.Member) -> str:
+    """Get brother name from Discord member, checking mapping file first."""
+    mapping = load_discord_mapping()
+    
+    # Try display name first (server nickname)
+    if member.display_name in mapping:
+        return mapping[member.display_name]
+    
+    # Try username (global username)
+    if member.name in mapping:
+        return mapping[member.name]
+    
+    # Try case-insensitive matching
+    display_lower = member.display_name.lower()
+    name_lower = member.name.lower()
+    for discord_name, brother_name in mapping.items():
+        if discord_name.lower() == display_lower or discord_name.lower() == name_lower:
+            return brother_name
+    
+    # Fall back to display name then username
+    return member.display_name or member.name
 
 
 async def send_schedule_embeds(channel, schedule_data):
@@ -91,6 +129,7 @@ def setup_commands(bot: commands.Bot, config):
         Usage: !my-chores [@member]
         """
         target = member or ctx.author
+        brother_name = get_brother_name(target)
         schedule_data = await load_schedule()
         
         if not schedule_data:
@@ -105,7 +144,8 @@ def setup_commands(bot: commands.Bot, config):
         # Find chores for this member
         member_chores = {}
         for item in schedule_data:
-            if target.display_name in item['assigned'] or target.name in item['assigned']:
+            # Check if brother_name is in the assigned list
+            if brother_name in item['assigned']:
                 date = item['due'].split(' ')[0]
                 if date not in member_chores:
                     member_chores[date] = []

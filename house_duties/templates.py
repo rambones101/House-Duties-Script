@@ -5,7 +5,7 @@ from .models import TaskTemplate
 
 # Default day assignments for consistency
 BASE_2X_DAYS_DEFAULT = [2, 4]  # Tuesday, Thursday
-BONUS_3RD_DAY_DEFAULT = [5]     # Friday
+BONUS_3RD_DAY_DEFAULT = []     # Friday
 
 
 def default_severity_for(label: str, category: str) -> int:
@@ -53,40 +53,29 @@ def build_templates() -> List[TaskTemplate]:
     # ==================== ZERO DECK ====================
     templates.extend([
         TaskTemplate(
-            key="ZD_KM_DAILY",
+            key="ZD_RATSKELLER_FLOOR",
             deck="Zero Deck",
-            label="K&M Daily",
-            category="k&m",
-            people_needed=2,
-            cadence="weekly",
-            days_of_week=[0, 1, 2, 3, 4, 5, 6],  # Every day
-            severity=3,
-            effort_multiplier=1.0
-        ),
-        TaskTemplate(
-            key="ZD_FLOORS",
-            deck="Zero Deck",
-            label="Floors",
+            label="Ratskeller Sweep+Mop",
             category="floors",
             people_needed=2,
             cadence="n_per_week",
             times_per_week=2,
             preferred_days=BASE_2X_DAYS_DEFAULT,
             severity=3,
-            effort_multiplier=1.2,
+            effort_multiplier=1.1,
             flexible_2_3x=True
         ),
         TaskTemplate(
-            key="ZD_BATHROOMS",
+            key="ZD_GAMEX_FLOOR",
             deck="Zero Deck",
-            label="Bathrooms",
-            category="bathrooms",
+            label="Game Room + X-Room Sweep+Mop",
+            category="floors",
             people_needed=2,
             cadence="n_per_week",
             times_per_week=2,
             preferred_days=BASE_2X_DAYS_DEFAULT,
-            severity=4,
-            effort_multiplier=1.3,
+            severity=3,
+            effort_multiplier=1.1,
             flexible_2_3x=True
         ),
     ])
@@ -94,29 +83,84 @@ def build_templates() -> List[TaskTemplate]:
     # ==================== FIRST DECK ====================
     templates.extend([
         TaskTemplate(
-            key="FD_FLOORS",
+            key="FD_KM_SUN",
             deck="First Deck",
-            label="Floors Sweep/Vacuum",
+            label="k&m",
+            category="k&m",
+            people_needed=3,
+            cadence="weekly",
+            days_of_week=[0],  # Sunday
+            severity=3,
+            effort_multiplier=1.2
+        ),
+        TaskTemplate(
+            key="FD_KM_MON",
+            deck="First Deck",
+            label="k&m",
+            category="k&m",
+            people_needed=2,
+            cadence="weekly",
+            days_of_week=[1],  # Monday
+            severity=3,
+            effort_multiplier=1.1
+        ),
+        TaskTemplate(
+            key="FD_KM_TUE",
+            deck="First Deck",
+            label="k&m",
+            category="k&m",
+            people_needed=2,
+            cadence="weekly",
+            days_of_week=[2],  # Tuesday
+            severity=3,
+            effort_multiplier=1.1
+        ),
+        TaskTemplate(
+            key="FD_KM_WED",
+            deck="First Deck",
+            label="k&m",
+            category="k&m",
+            people_needed=2,
+            cadence="weekly",
+            days_of_week=[3],  # Wednesday
+            severity=3,
+            effort_multiplier=1.1
+        ),
+        TaskTemplate(
+            key="FD_KM_THU",
+            deck="First Deck",
+            label="k&m",
+            category="k&m",
+            people_needed=2,
+            cadence="weekly",
+            days_of_week=[4],  # Thursday
+            severity=3,
+            effort_multiplier=1.1
+        ),
+        TaskTemplate(
+            key="FD_LIVING_FLOOR",
+            deck="First Deck",
+            label="Living Room Sweep+Mop",
             category="floors",
             people_needed=2,
             cadence="n_per_week",
             times_per_week=2,
             preferred_days=BASE_2X_DAYS_DEFAULT,
             severity=3,
-            effort_multiplier=1.1,
+            effort_multiplier=1.05,
             flexible_2_3x=True
         ),
         TaskTemplate(
-            key="FD_BATHROOMS",
+            key="FD_DINING_FLOOR",
             deck="First Deck",
-            label="Clean Bathrooms",
-            category="bathrooms",
+            label="Dining Room Sweep+Mop",
+            category="floors",
             people_needed=2,
             cadence="n_per_week",
             times_per_week=2,
             preferred_days=BASE_2X_DAYS_DEFAULT,
-            severity=4,
-            effort_multiplier=1.2,
+            severity=3,
+            effort_multiplier=1.05,
             flexible_2_3x=True
         ),
     ])
@@ -124,46 +168,59 @@ def build_templates() -> List[TaskTemplate]:
     # ==================== SECOND DECK ====================
     templates.extend([
         TaskTemplate(
-            key="SD_SINKS",
+            key="SD_HALL_FLOOR",
             deck="Second Deck",
-            label="Sinks Clean/Sweep Bathroom",
-            category="bathrooms",
+            label="Hallway Sweep+Mop",
+            category="floors",
             people_needed=2,
             cadence="n_per_week",
             times_per_week=2,
             preferred_days=BASE_2X_DAYS_DEFAULT,
+            severity=3,
+            effort_multiplier=1.0,
+            flexible_2_3x=True
+        ),
+        TaskTemplate(
+            key="SD_SINKS",
+            deck="Second Deck",
+            label="Sinks Clean/Sweep Bathroom",
+            category="bathrooms",
+            people_needed=1,
+            cadence="n_per_week",
+            times_per_week=2,
+            preferred_days=BASE_2X_DAYS_DEFAULT,
             severity=4,
-            effort_multiplier=1.1,
+            effort_multiplier=1.0,
             flexible_2_3x=True
         ),
         TaskTemplate(
             key="SD_TOILETS",
             deck="Second Deck",
-            label="Toilets/Showers",
+            label="Toilets Clean/Mop Bathroom",
             category="bathrooms",
-            people_needed=2,
+            people_needed=1,
             cadence="n_per_week",
             times_per_week=2,
             preferred_days=BASE_2X_DAYS_DEFAULT,
-            severity=5,
-            effort_multiplier=1.3,
+            severity=4,
+            effort_multiplier=1.0,
             flexible_2_3x=True
         ),
         TaskTemplate(
-            key="SD_BRASSO",
+            key="SD_SHOWERS",
             deck="Second Deck",
-            label="Brasso",
-            category="other",
+            label="Showers Clean",
+            category="bathrooms",
             people_needed=2,
-            cadence="biweekly",
+            cadence="weekly",
             days_of_week=[6],  # Saturday
-            severity=5,
-            effort_multiplier=1.5
+            severity=4,
+            effort_multiplier=1.2
         ),
         TaskTemplate(
-            key="SD_FLOORS",
+            key="SD_STAIRS_FLOOR",
             deck="Second Deck",
-            label="Floors Sweep/Vacuum",
+            label="Stairs Sweep+Mop",
             category="floors",
             people_needed=2,
             cadence="n_per_week",
@@ -173,16 +230,73 @@ def build_templates() -> List[TaskTemplate]:
             effort_multiplier=1.1,
             flexible_2_3x=True
         ),
+        TaskTemplate(
+            key="SD_LROOM",
+            deck="Second Deck",
+            label="L-Room Clean",
+            category="common",
+            people_needed=1,
+            cadence="weekly",
+            days_of_week=[6],  # Saturday
+            severity=3,
+            effort_multiplier=1.0
+        ),
+        TaskTemplate(
+            key="SD_LIBRARY",
+            deck="Second Deck",
+            label="Library Clean",
+            category="common",
+            people_needed=1,
+            cadence="weekly",
+            days_of_week=[6],  # Saturday
+            severity=3,
+            effort_multiplier=1.0
+        ),
+        # TaskTemplate(
+        #     key="SD_BRASSO",
+        #     deck="Second Deck",
+        #     label="Brasso",
+        #     category="other",
+        #     people_needed=1,
+        #     cadence="biweekly",
+        #     days_of_week=[6],  # Saturday
+        #     severity=3,
+        #     effort_multiplier=1.0
+        # ),
+        # TaskTemplate(
+        #     key="SD_BLUE",
+        #     deck="Second Deck",
+        #     label="Blue",
+        #     category="other",
+        #     people_needed=1,
+        #     cadence="biweekly",
+        #     days_of_week=[6],  # Saturday
+        #     severity=3,
+        #     effort_multiplier=1.0
+        # ),
     ])
     
     # ==================== THIRD DECK ====================
     templates.extend([
         TaskTemplate(
+            key="TD_HALL_FLOOR",
+            deck="Third Deck",
+            label="Hallway Sweep+Mop",
+            category="floors",
+            people_needed=2,
+            cadence="n_per_week",
+            times_per_week=2,
+            preferred_days=BASE_2X_DAYS_DEFAULT,
+            severity=3,
+            effort_multiplier=1.0,
+            flexible_2_3x=True
+        ),
+        TaskTemplate(
             key="TD_SINKS",
             deck="Third Deck",
-            label="Sinks Clean/Sweep",
+            label="Sinks Clean/Sweep Bathroom",
             category="bathrooms",
-            people_needed=2,
+            people_needed=1,
             cadence="n_per_week",
             times_per_week=2,
             preferred_days=BASE_2X_DAYS_DEFAULT,
@@ -193,66 +307,62 @@ def build_templates() -> List[TaskTemplate]:
         TaskTemplate(
             key="TD_TOILETS",
             deck="Third Deck",
-            label="Toilets/Showers",
+            label="Toilets Clean/Mop Bathroom",
             category="bathrooms",
-            people_needed=2,
+            people_needed=1,
             cadence="n_per_week",
             times_per_week=2,
             preferred_days=BASE_2X_DAYS_DEFAULT,
-            severity=5,
-            effort_multiplier=1.2,
+            severity=4,
+            effort_multiplier=1.0,
             flexible_2_3x=True
         ),
         TaskTemplate(
-            key="TD_BLUE",
+            key="TD_SHOWERS",
             deck="Third Deck",
-            label="Blue (Deck Cleaning)",
-            category="other",
+            label="Showers Clean",
+            category="bathrooms",
             people_needed=2,
-            cadence="biweekly",
+            cadence="weekly",
             days_of_week=[6],  # Saturday
-            severity=5,
-            effort_multiplier=1.4
+            severity=4,
+            effort_multiplier=1.2
         ),
         TaskTemplate(
-            key="TD_FLOORS",
+            key="TD_STAIRS_FLOOR",
             deck="Third Deck",
-            label="Floors Sweep/Vacuum",
+            label="Stairs Sweep+Mop",
             category="floors",
             people_needed=2,
             cadence="n_per_week",
             times_per_week=2,
             preferred_days=BASE_2X_DAYS_DEFAULT,
             severity=3,
-            effort_multiplier=1.0,
+            effort_multiplier=1.1,
             flexible_2_3x=True
         ),
-    ])
-    
-    # ==================== COMMON/OTHER ====================
-    templates.extend([
-        TaskTemplate(
-            key="LAUNDRY",
-            deck="Other",
-            label="Laundry",
-            category="laundry",
-            people_needed=2,
-            cadence="weekly",
-            days_of_week=[1, 4],  # Monday, Thursday
-            severity=3,
-            effort_multiplier=1.0
-        ),
-        TaskTemplate(
-            key="TRASH",
-            deck="Other",
-            label="Take Out Trash",
-            category="common",
-            people_needed=1,
-            cadence="weekly",
-            days_of_week=[0, 3, 6],  # Sun, Wed, Sat
-            severity=2,
-            effort_multiplier=0.8
-        ),
+        # TaskTemplate(
+        #     key="TD_BRASSO",
+        #     deck="Third Deck",
+        #     label="Brasso",
+        #     category="other",
+        #     people_needed=1,
+        #     cadence="biweekly",
+        #     days_of_week=[6],  # Saturday
+        #     severity=3,
+        #     effort_multiplier=1.0
+        # ),
+        # TaskTemplate(
+        #     key="TD_BLUE",
+        #     deck="Third Deck",
+        #     label="Blue",
+        #     category="other",
+        #     people_needed=1,
+        #     cadence="biweekly",
+        #     days_of_week=[6],  # Saturday
+        #     severity=3,
+        #     effort_multiplier=1.0
+        # ),
     ])
     
     return templates

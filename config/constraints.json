@@ -1,0 +1,15 @@
+{
+  "exempt_all": [],
+  "on_call_only": [],
+  "max_per_brother_per_week": 5,
+  "max_per_brother_per_day": 2,
+  "brother_category_bans": {},
+  "brother_task_bans": {},
+  "brother_preferred_categories": {},
+  "brother_unavailable_dates": {
+    "EXAMPLE - John Smith": ["2026-01-30"],
+    "EXAMPLE - Jane Doe": [{"start": "2026-02-15", "end": "2026-02-22"}],
+    "Sal": [{"start": "2026-01-29", "end": "2026-01-31"}],
+    "Carlos": [{"start": "2026-01-29", "end": "2026-01-31"}]
+  }
+}

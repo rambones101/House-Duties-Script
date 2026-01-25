@@ -160,6 +160,7 @@ DEFAULT_CONSTRAINTS = {
     "brother_category_bans": {},
     "brother_task_bans": {},
     "brother_preferred_categories": {},
+    "brother_unavailable_dates": {},
 }
 
 

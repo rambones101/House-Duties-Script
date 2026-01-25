@@ -16,15 +16,17 @@ def write_csv(schedule_items: List[Dict[str, Any]], filepath: str):
     try:
         rows = []
         for item in schedule_items:
+            # Parse due datetime from ISO string
+            due_dt = datetime.fromisoformat(item["due"])
             rows.append({
-                "due": item["due_dt"].strftime("%Y-%m-%d %H:%M"),
+                "due": due_dt.strftime("%Y-%m-%d %H:%M"),
                 "deck": item["deck"],
                 "task_key": item["task_key"],
-                "task": item["task_label"],
+                "task": item["task"],
                 "category": item["category"],
                 "people_needed": item["people_needed"],
                 "assigned": ", ".join(item["assigned"]),
-                "weight_total": round(item["weight"], 2)
+                "weight_total": round(item["weight_total"], 2)
             })
         rows.sort(key=lambda x: (DECK_ORDER.index(x["deck"]) if x["deck"] in DECK_ORDER else 999, x["due"]))
         
@@ -45,18 +47,10 @@ def write_csv(schedule_items: List[Dict[str, Any]], filepath: str):
 def write_json(schedule_items: List[Dict[str, Any]], filepath: str):
     """Write schedule to JSON file with error handling."""
     try:
-        # Convert datetime objects to ISO format strings
-        serializable_items = []
-        for item in schedule_items:
-            serializable = item.copy()
-            if "due_dt" in serializable and isinstance(serializable["due_dt"], datetime):
-                serializable["due_dt"] = serializable["due_dt"].isoformat()
-            serializable_items.append(serializable)
-        
         with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(serializable_items, f, indent=2)
+            json.dump(schedule_items, f, indent=2)
         
-        logger.info(f"Wrote {len(serializable_items)} schedule items to '{filepath}'")
+        logger.info(f"Wrote {len(schedule_items)} schedule items to '{filepath}'")
     
     except Exception as e:
         logger.error(f"Error writing JSON to '{filepath}': {e}")
@@ -84,7 +78,7 @@ def print_schedule_by_deck(schedule_items: List[Dict[str, Any]],
     # Group by day then by deck
     by_day: Dict[date, Dict[str, List[Dict[str, Any]]]] = {}
     for item in schedule_items:
-        day = item["due_dt"].date()
+        day = datetime.fromisoformat(item["due"]).date()
         if day not in by_day:
             by_day[day] = {}
         deck = item["deck"]
@@ -108,7 +102,7 @@ def print_schedule_by_deck(schedule_items: List[Dict[str, Any]],
             for task in tasks:
                 assigned_str = ", ".join(task["assigned"])
                 people_count = len(task["assigned"])
-                print(f"    - {task['task_label']}")
+                print(f"    - {task['task']}")
                 print(f"      > Assigned: {assigned_str} ({people_count} person{'s' if people_count != 1 else ''})")
                 print()
     

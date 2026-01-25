@@ -208,9 +208,30 @@ Create `constraints.json`:
   },
   "brother_preferred_categories": {
     "Alex": ["floors"]
+  },
+  "brother_unavailable_dates": {
+    "Mike": ["2026-01-27"],
+    "Sarah": [
+      {"start": "2026-02-15", "end": "2026-02-22"}
+    ],
+    "Tom": [
+      "2026-01-30",
+      {"start": "2026-03-01", "end": "2026-03-07"}
+    ]
   }
 }
 ```
+
+**Constraint Types:**
+- `exempt_all`: Permanently exclude from all chores
+- `on_call_only`: Use only as backup when no one else available
+- `max_per_brother_per_week` / `max_per_brother_per_day`: Task limits
+- `brother_category_bans`: Exclude from specific categories
+- `brother_task_bans`: Exclude from specific tasks
+- `brother_preferred_categories`: Give preference bonus (-0.35 score)
+- **`brother_unavailable_dates`**: Temporarily exclude for specific dates/ranges
+  - Single date: `"2026-01-27"` (YYYY-MM-DD format)
+  - Date range: `{"start": "2026-02-15", "end": "2026-02-22"}` (inclusive)
 
 ### Adding New Tasks
 
