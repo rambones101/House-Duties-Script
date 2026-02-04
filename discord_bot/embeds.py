@@ -107,7 +107,8 @@ def create_member_chores_embed(member, chores_by_date: Dict[str, List[Dict]]) ->
         
         chores_text = ""
         for item in chores_by_date[date_str]:
-            chores_text += f"• **{item['task']}** ({item['deck']})\n"
+            assigned = ", ".join(item['assigned'])
+            chores_text += f"• **{item['task']}** ({item['deck']})\n  └ With: {assigned}\n"
             total_chores += 1
         
         embed.add_field(name=dow, value=chores_text, inline=False)
